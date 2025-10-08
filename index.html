@@ -10,7 +10,11 @@
     <!-- Landing/Auth Section -->
     <div id="auth-section" class="container">
         <header class="text-center mb-lg">
-            <h1 style="font-size: 3rem; color: var(--primary-color); margin-bottom: var(--spacing-sm); font-weight: 700;">VeriTrust</h1>
+            <!-- Replace header title with brand + logo -->
+            <div class="brand brand-lg center">
+                <img src="photos/VTLogo.svg" alt="VeriTrust logo" />
+                <h1 class="brand-text">VeriTrust</h1>
+            </div>
             <p style="font-size: 1.2rem; color: var(--text-secondary);">Secure Identity. Trusted Community.</p>
         </header>
 
@@ -265,7 +269,11 @@
     <!-- App Container -->
     <div id="app-section" class="app-container hidden">
         <nav class="sidebar">
-            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: var(--spacing-xl);">VeriTrust</div>
+            <!-- Replace sidebar brand text with brand + logo -->
+            <div class="brand" style="margin-bottom: var(--spacing-xl);">
+                <img src="photos/VTLogo.svg" alt="VeriTrust logo" />
+                <span class="brand-text">VeriTrust</span>
+            </div>
             <div class="nav-links">
                 <a href="#" class="nav-link active" onclick="showPage('dashboard')">
                     <span>🏠</span>Dashboard
@@ -441,9 +449,10 @@
             const pages = {
                 dashboard: `
                     <div class="status-card mb-lg">
-                        <h3>Welcome back!</h3>
+                        <h3>Welcome back, ${state.currentUser?.firstName || 'User'}!</h3>
                         <p>Your identity is verified. Access all features securely.</p>
                     </div>
+                    
                     <div class="action-grid">
                         <div class="action-card" onclick="showPage('securefind')">
                             <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">📱</div>
@@ -454,6 +463,65 @@
                             <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">➕</div>
                             <h4>Add Task</h4>
                             <p>Create a new task to stay organized</p>
+                        </div>
+                        <div class="action-card" onclick="showPage('messages')">
+                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">💬</div>
+                            <h4>Messages</h4>
+                            <p>Check your conversations and updates</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-widgets">
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <h3 class="widget-title">Recent SecureFind Activity</h3>
+                                <a href="#" class="widget-view-all" onclick="showPage('securefind')">View All →</a>
+                            </div>
+                            <div class="widget-content" id="securefind-widget">
+                                <!-- Will be populated by renderSecureFindWidget -->
+                            </div>
+                        </div>
+
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <h3 class="widget-title">Upcoming Tasks</h3>
+                                <a href="#" class="widget-view-all" onclick="showPage('easytask')">View All →</a>
+                            </div>
+                            <div class="widget-content" id="tasks-widget">
+                                <!-- Will be populated by renderTasksWidget -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-widgets" style="margin-top: var(--spacing-lg);">
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <h3 class="widget-title">Quick Stats</h3>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); text-align: center;">
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">${dashboardData.recentSecureFindItems.filter(item => item.status === 'lost').length}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Lost Items</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">${dashboardData.recentSecureFindItems.filter(item => item.status === 'found').length}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Found Items</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning-color);">${dashboardData.upcomingTasks.filter(task => !task.completed).length}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Pending Tasks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <h3 class="widget-title">Recent Notifications</h3>
+                                <a href="#" class="widget-view-all" onclick="showPage('notifications')">View All →</a>
+                            </div>
+                            <div class="widget-content" id="notifications-widget">
+                                <!-- Will be populated by renderNotificationsWidget -->
+                            </div>
                         </div>
                     </div>
                 `,
@@ -473,6 +541,9 @@
                             <h4>Blue Wallet</h4>
                             <p>📍 Central Park</p>
                             <p>Found 6 hours ago</p>
+                            <div style="margin-top: var(--spacing-sm);">
+                                <button class="btn-secondary" onclick="openClaimModal('item2')">Claim Item</button>
+                            </div>
                         </div>
                         <div class="item-card">
                             <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">🎒</div>
@@ -574,14 +645,273 @@
                             </div>
                         </div>
                     </div>
+                `,
+                notifications: `
+                    <div class="notifications-wrapper">
+                        <div class="notifications-header">
+                            <div>
+                                <h3>Notifications</h3>
+                                <p id="unreadCount" style="color: var(--text-secondary); margin-top: var(--spacing-xs);"></p>
+                            </div>
+                            <div class="notifications-actions">
+                                <button class="btn-secondary" onclick="markAllNotificationsRead()">Mark All Read</button>
+                                <button class="btn-secondary" onclick="clearReadNotifications()">Clear Read</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: var(--spacing-md);">
+                            <input type="text" id="notificationSearch" placeholder="Search notifications..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                        </div>
+                        <div id="notificationsList" class="notifications-list">
+                            <!-- Notifications will be populated here -->
+                        </div>
+                        <div id="emptyNotifications" class="empty-notifications" style="display: none;">
+                            <div class="empty-notifications-icon">🔔</div>
+                            <h3>No notifications</h3>
+                            <p>You're all caught up!</p>
+                        </div>
+                    </div>
                 `
             };
             
             content.innerHTML = pages[page] || '<div class="text-center">Page not found</div>';
             
-            // Initialize messages if on messages page
+            // Initialize page-specific functionality
             if (page === 'messages') {
                 initializeMessages();
+            } else if (page === 'notifications') {
+                initializeNotifications();
+            } else if (page === 'dashboard') {
+                initializeDashboard();
+            }
+        }
+
+        // Sample data for dashboard widgets
+        const dashboardData = {
+            recentSecureFindItems: [
+                {
+                    id: 'item1',
+                    title: 'iPhone 15 Pro',
+                    location: 'Downtown Coffee Shop',
+                    status: 'lost',
+                    time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                    icon: '📱',
+                    priority: 'high'
+                },
+                {
+                    id: 'item2',
+                    title: 'Blue Wallet',
+                    location: 'Central Park',
+                    status: 'found',
+                    time: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+                    icon: '💳',
+                    priority: 'medium'
+                },
+                {
+                    id: 'item3',
+                    title: 'Black Backpack',
+                    location: 'University Campus',
+                    status: 'lost',
+                    time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                    icon: '🎒',
+                    priority: 'low'
+                },
+                {
+                    id: 'item4',
+                    title: 'Reading Glasses',
+                    location: 'Public Library',
+                    status: 'found',
+                    time: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+                    icon: '👓',
+                    priority: 'low'
+                }
+            ],
+            upcomingTasks: [
+                {
+                    id: 'task1',
+                    title: 'Review SecureFind matches',
+                    description: 'Check potential matches and respond to messages',
+                    dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
+                    priority: 'high',
+                    completed: false
+                },
+                {
+                    id: 'task2',
+                    title: 'Complete profile verification',
+                    description: 'Add additional verification details',
+                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day from now
+                    priority: 'medium',
+                    completed: false
+                },
+                {
+                    id: 'task3',
+                    title: 'Update contact information',
+                    description: 'Verify phone number and address',
+                    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+                    priority: 'low',
+                    completed: false
+                },
+                {
+                    id: 'task4',
+                    title: 'Schedule dentist appointment',
+                    description: 'Call office to book routine cleaning',
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+                    priority: 'low',
+                    completed: true
+                }
+            ]
+        };
+
+        // Dashboard widget functions
+        function initializeDashboard() {
+            renderSecureFindWidget();
+            renderTasksWidget();
+            renderNotificationsWidget();
+        }
+
+        function renderSecureFindWidget() {
+            const widget = $('securefind-widget');
+            if (!widget) return;
+
+            const recentItems = dashboardData.recentSecureFindItems.slice(0, 3); // Show only 3 most recent
+
+            if (recentItems.length === 0) {
+                widget.innerHTML = `
+                    <div class="widget-empty">
+                        <div class="widget-empty-icon">🔍</div>
+                        <p>No recent SecureFind activity</p>
+                    </div>
+                `;
+                return;
+            }
+
+            widget.innerHTML = recentItems.map(item => {
+                const timeAgo = getTimeAgo(item.time);
+                return `
+                    <div class="widget-item" onclick="showPage('securefind')">
+                        <div class="widget-item-icon">
+                            ${item.icon}
+                        </div>
+                        <div class="widget-item-content">
+                            <div class="widget-item-title">${item.title}</div>
+                            <div class="widget-item-subtitle">
+                                <span>📍 ${item.location}</span>
+                                <span class="item-status-badge ${item.status}">${item.status.toUpperCase()}</span>
+                            </div>
+                            <div class="widget-item-meta">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTasksWidget() {
+            const widget = $('tasks-widget');
+            if (!widget) return;
+
+            const upcomingTasks = dashboardData.upcomingTasks
+                .filter(task => !task.completed)
+                .sort((a, b) => a.dueDate - b.dueDate)
+                .slice(0, 3); // Show only 3 most urgent
+
+            if (upcomingTasks.length === 0) {
+                widget.innerHTML = `
+                    <div class="widget-empty">
+                        <div class="widget-empty-icon">✅</div>
+                        <p>All tasks completed!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            widget.innerHTML = upcomingTasks.map(task => {
+                const timeUntilDue = getTimeUntilDue(task.dueDate);
+                const priorityColor = task.priority === 'high' ? 'var(--error-color)' : 
+                                    task.priority === 'medium' ? 'var(--warning-color)' : 'var(--text-secondary)';
+                
+                return `
+                    <div class="widget-item" onclick="showPage('easytask')">
+                        <input type="checkbox" class="task-checkbox-widget" onchange="toggleTaskFromDashboard('${task.id}', this.checked)" onclick="event.stopPropagation()">
+                        <div class="widget-item-content">
+                            <div class="widget-item-title">${task.title}</div>
+                            <div class="widget-item-subtitle">${task.description}</div>
+                            <div class="widget-item-meta" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Due ${timeUntilDue}</span>
+                                <span style="color: ${priorityColor}; font-weight: 500;">${task.priority.toUpperCase()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderNotificationsWidget() {
+            const widget = $('notifications-widget');
+            if (!widget) return;
+
+            const recentNotifications = notificationData.notifications
+                .slice(0, 3) // Show only 3 most recent
+                .map(notification => {
+                    const timeAgo = getTimeAgo(notification.time);
+                    const typeIcon = getNotificationIcon(notification.type);
+                    
+                    return `
+                        <div class="widget-item ${notification.read ? 'read' : 'unread'}" onclick="openNotificationDetail('${notification.id}')">
+                            <div class="widget-item-icon" style="background: ${getNotificationColor(notification.type)}; color: white;">
+                                ${typeIcon}
+                            </div>
+                            <div class="widget-item-content">
+                                <div class="widget-item-title">${notification.title}</div>
+                                <div class="widget-item-subtitle">${notification.text}</div>
+                                <div class="widget-item-meta">${timeAgo}</div>
+                            </div>
+                            ${!notification.read ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); flex-shrink: 0;"></div>' : ''}
+                        </div>
+                    `;
+                }).join('');
+
+            if (recentNotifications === '') {
+                widget.innerHTML = `
+                    <div class="widget-empty">
+                        <div class="widget-empty-icon">🔔</div>
+                        <p>No recent notifications</p>
+                    </div>
+                `;
+            } else {
+                widget.innerHTML = recentNotifications;
+            }
+        }
+
+        function getNotificationColor(type) {
+            const colors = {
+                message: 'var(--accent-color)',
+                match: 'var(--success-color)',
+                task: 'var(--warning-color)',
+                system: 'var(--primary-color)'
+            };
+            return colors[type] || 'var(--text-secondary)';
+        }
+
+        function getTimeUntilDue(dueDate) {
+            const now = new Date();
+            const diffMs = dueDate - now;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMs < 0) return 'overdue';
+            if (diffHours < 1) return 'in less than 1 hour';
+            if (diffHours < 24) return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+            if (diffDays < 7) return `in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+            return dueDate.toLocaleDateString();
+        }
+
+        function toggleTaskFromDashboard(taskId, completed) {
+            const task = dashboardData.upcomingTasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = completed;
+                // Re-render the tasks widget to update the display
+                setTimeout(() => {
+                    renderTasksWidget();
+                }, 100);
             }
         }
 
@@ -884,6 +1214,260 @@
             selectContact(newConversation.id);
         }
 
+        // Sample notification data
+        const notificationData = {
+            notifications: [
+                {
+                    id: 'notif1',
+                    type: 'match',
+                    title: 'Potential Match Found',
+                    text: 'Your lost iPhone 15 Pro may have been found! Sarah Johnson posted a matching item in Central Park.',
+                    time: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
+                    read: false,
+                    actionable: true
+                },
+                {
+                    id: 'notif2',
+                    type: 'message',
+                    title: 'New Message',
+                    text: 'Mike Chen sent you a message about the blue wallet you found.',
+                    time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                    read: false,
+                    actionable: true
+                },
+                {
+                    id: 'notif3',
+                    type: 'task',
+                    title: 'Task Reminder',
+                    text: 'Don\'t forget to complete your profile verification.',
+                    time: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+                    read: true,
+                    actionable: false
+                },
+                {
+                    id: 'notif4',
+                    type: 'system',
+                    title: 'Verification Complete',
+                    text: 'Your identity has been successfully verified. You now have access to all VeriTrust features.',
+                    time: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+                    read: true,
+                    actionable: false
+                },
+                {
+                    id: 'notif5',
+                    type: 'match',
+                    title: 'Item Status Update',
+                    text: 'The black backpack you reported as found has been claimed by its owner.',
+                    time: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                    read: false,
+                    actionable: false
+                }
+            ]
+        };
+
+        // Notification functions
+        function initializeNotifications() {
+            renderNotifications();
+            setupNotificationSearch();
+            updateNotificationBadge();
+        }
+
+        function renderNotifications() {
+            const notificationsList = $('notificationsList');
+            const emptyState = $('emptyNotifications');
+            const unreadCount = $('unreadCount');
+            
+            if (!notificationsList) return;
+            
+            const searchTerm = ($('notificationSearch')?.value || '').toLowerCase();
+            const filteredNotifications = notificationData.notifications.filter(notif => 
+                notif.title.toLowerCase().includes(searchTerm) || 
+                notif.text.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredNotifications.length === 0) {
+                notificationsList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            notificationsList.style.display = 'flex';
+            emptyState.style.display = 'none';
+            
+            const unreadNotifications = notificationData.notifications.filter(n => !n.read);
+            if (unreadCount) {
+                unreadCount.textContent = `${unreadNotifications.length} unread notification${unreadNotifications.length !== 1 ? 's' : ''}`;
+            }
+            
+            notificationsList.innerHTML = filteredNotifications.map(notification => {
+                const timeAgo = getTimeAgo(notification.time);
+                const typeIcon = getNotificationIcon(notification.type);
+                
+                return `
+                    <div class="notification-item ${notification.read ? 'read' : 'unread'}" onclick="openNotificationDetail('${notification.id}')">
+                        <div class="notification-header">
+                            <div style="display: flex; align-items: center;">
+                                <div class="notification-type-icon ${notification.type}">
+                                    ${typeIcon}
+                                </div>
+                                <div class="notification-title">${notification.title}</div>
+                            </div>
+                            <div class="notification-time">${timeAgo}</div>
+                        </div>
+                        <div class="notification-text">${notification.text}</div>
+                        <div class="notification-actions">
+                            ${!notification.read ? `<button class="notification-action-btn" onclick="event.stopPropagation(); markNotificationRead('${notification.id}')">Mark as read</button>` : ''}
+                            ${notification.actionable ? `<button class="notification-action-btn" onclick="event.stopPropagation(); handleNotificationAction('${notification.id}')">View details</button>` : ''}
+                            <button class="notification-action-btn" onclick="event.stopPropagation(); deleteNotification('${notification.id}')" style="color: var(--error-color);">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                message: '💬',
+                match: '✨',
+                task: '📝',
+                system: '⚙️'
+            };
+            return icons[type] || '📢';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMinutes < 1) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function setupNotificationSearch() {
+            const searchInput = $('notificationSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    renderNotifications();
+                });
+            }
+        }
+
+        function markNotificationRead(notificationId) {
+            const notification = notificationData.notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                renderNotifications();
+                updateNotificationBadge();
+                saveNotificationsToStorage();
+            }
+        }
+
+        function markAllNotificationsRead() {
+            notificationData.notifications.forEach(notification => {
+                notification.read = true;
+            });
+            renderNotifications();
+            updateNotificationBadge();
+            saveNotificationsToStorage();
+        }
+
+        function deleteNotification(notificationId) {
+            const index = notificationData.notifications.findIndex(n => n.id === notificationId);
+            if (index > -1) {
+                notificationData.notifications.splice(index, 1);
+                renderNotifications();
+                updateNotificationBadge();
+                saveNotificationsToStorage();
+            }
+        }
+
+        function clearReadNotifications() {
+            notificationData.notifications = notificationData.notifications.filter(n => !n.read);
+            renderNotifications();
+            updateNotificationBadge();
+            saveNotificationsToStorage();
+        }
+
+        function openNotificationDetail(notificationId) {
+            const notification = notificationData.notifications.find(n => n.id === notificationId);
+            if (!notification) return;
+            
+            // Mark as read when opened
+            if (!notification.read) {
+                markNotificationRead(notificationId);
+            }
+            
+            // Handle different notification types
+            switch (notification.type) {
+                case 'message':
+                    showPage('messages');
+                    break;
+                case 'match':
+                    showPage('securefind');
+                    break;
+                case 'task':
+                    showPage('easytask');
+                    break;
+                default:
+                    // Show a simple alert for system notifications
+                    alert(notification.text);
+            }
+        }
+
+        function handleNotificationAction(notificationId) {
+            const notification = notificationData.notifications.find(n => n.id === notificationId);
+            if (!notification) return;
+            
+            openNotificationDetail(notificationId);
+        }
+
+        function updateNotificationBadge() {
+            const unreadCount = notificationData.notifications.filter(n => !n.read).length;
+            const notificationBtn = document.querySelector('button[onclick="showPage(\'notifications\')"]');
+            
+            if (notificationBtn) {
+                // Remove existing badge
+                const existingBadge = notificationBtn.querySelector('.unread-badge');
+                if (existingBadge) {
+                    existingBadge.remove();
+                }
+                
+                // Add new badge if there are unread notifications
+                if (unreadCount > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'unread-badge';
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    notificationBtn.appendChild(badge);
+                }
+            }
+        }
+
+        function saveNotificationsToStorage() {
+            localStorage.setItem('veritrustNotifications', JSON.stringify(notificationData.notifications));
+        }
+
+        function loadNotificationsFromStorage() {
+            const stored = localStorage.getItem('veritrustNotifications');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    // Convert time strings back to Date objects
+                    notificationData.notifications = parsed.map(notif => ({
+                        ...notif,
+                        time: new Date(notif.time)
+                    }));
+                } catch (e) {
+                    console.error('Error loading notifications:', e);
+                }
+            }
+        }
+
         // Helper functions
         function togglePassword(inputId, btn) {
             const input = $(inputId);
@@ -909,6 +1493,9 @@
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
+            // Load notifications from storage
+            loadNotificationsFromStorage();
+            
             const session = getCookie('session');
             if (session) {
                 const userData = getUser();
@@ -916,6 +1503,8 @@
                     state.currentUser = userData;
                     state.isVerified = session.verified;
                     startApp();
+                    // Update notification badge after app starts
+                    setTimeout(updateNotificationBadge, 100);
                     return;
                 }
             }
@@ -946,6 +1535,207 @@
                 }
             });
         });
+
+        // Helper: add a notification
+    function addNotification({ type = 'system', title, text }) {
+        notificationData.notifications.unshift({
+            id: 'notif_' + Date.now(),
+            type,
+            title,
+            text,
+            time: new Date(),
+            read: false,
+            actionable: false
+        });
+        saveNotificationsToStorage();
+        updateNotificationBadge();
+        if (state.currentPage === 'notifications') {
+            renderNotifications();
+        }
+        // Also refresh dashboard widget if visible
+        if (state.currentPage === 'dashboard') {
+            renderNotificationsWidget?.();
+        }
+    }
+
+    // Claim (State ID verification) state and handlers
+    const claimState = { itemId: null };
+
+    function getItemById(itemId) {
+        // Reuse dashboard data items for quick lookup
+        return (dashboardData?.recentSecureFindItems || []).find(i => i.id === itemId) || null;
+    }
+
+    function openClaimModal(itemId) {
+        claimState.itemId = itemId;
+        const item = getItemById(itemId);
+        // Reset steps
+        $('#claimStepForm').style.display = 'block';
+        $('#claimStepPending').style.display = 'none';
+        $('#claimStepSuccess').style.display = 'none';
+        $('#claimStepFailed').style.display = 'none';
+
+        // Prefill
+        const u = state.currentUser || getUser();
+        $('#claimItemTitle').textContent = item ? item.title : 'Item';
+        $('#claimFullName').value = [u.firstName || '', u.lastName || ''].join(' ').trim();
+        $('#claimIdNumber').value = '';
+        $('#claimExp').value = '';
+        $('#claimState').value = '';
+        $('#claimIdImage').value = '';
+        $('#claimConfirm').checked = false;
+
+        // Show modal
+        $('#claimModal').classList.add('active');
+    }
+
+    function closeClaimModal() {
+        $('#claimModal').classList.remove('active');
+    }
+
+    function startClaimVerification(e) {
+        e.preventDefault();
+        const fullName = $('#claimFullName').value.trim();
+        const issuingState = $('#claimState').value;
+        const idNum = $('#claimIdNumber').value.trim();
+        const exp = $('#claimExp').value;
+        const image = $('#claimIdImage').files[0];
+        const confirmed = $('#claimConfirm').checked;
+
+        if (!fullName || !issuingState || !idNum || !exp || !image || !confirmed) {
+            alert('Please complete all required fields and confirmations.');
+            return;
+        }
+
+        // Show pending
+        $('#claimStepForm').style.display = 'none';
+        $('#claimStepPending').style.display = 'block';
+
+        // Simulate verification check
+        setTimeout(() => {
+            // 85% success simulation
+            const success = Math.random() < 0.85;
+            $('#claimStepPending').style.display = 'none';
+            if (success) {
+                const item = getItemById(claimState.itemId);
+                $('#claimStepSuccess').style.display = 'block';
+                // Notify
+                addNotification({
+                    type: 'system',
+                    title: 'Claim submitted',
+                    text: `Your State ID was verified for ${item ? item.title : 'the item'}. The finder will be notified.`
+                });
+            } else {
+                $('#claimStepFailed').style.display = 'block';
+            }
+        }, 1500);
+    }
+
+    function retryClaimVerification() {
+        // Return to form step
+        $('#claimStepFailed').style.display = 'none';
+        $('#claimStepForm').style.display = 'block';
+    }
     </script>
+
+    <!-- Claim Modal -->
+<div id="claimModal" class="modal">
+    <div class="modal-content" style="max-width: 560px;">
+        <div class="claim-section">
+            <h3>Claim Verification</h3>
+            <div class="muted" style="margin-top:-8px;">Item: <strong id="claimItemTitle">Item</strong></div>
+        </div>
+
+        <!-- Step: Form -->
+        <form id="claimStepForm" onsubmit="startClaimVerification(event)">
+            <div class="claim-section" style="padding-top:0;">
+                <div class="form-group">
+                    <label for="claimFullName">Full Name *</label>
+                    <input id="claimFullName" type="text" required>
+                    <div class="claim-hint">As shown on your State ID</div>
+                </div>
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                    <div class="form-group">
+                        <label for="claimState">Issuing State *</label>
+                        <select id="claimState" required>
+                            <option value="">Select state</option>
+                            <!-- Minimal subset for brevity -->
+                            <option value="CA">California</option>
+                            <option value="NY">New York</option>
+                            <option value="TX">Texas</option>
+                            <option value="FL">Florida</option>
+                            <option value="IL">Illinois</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="OH">Ohio</option>
+                            <option value="GA">Georgia</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="MI">Michigan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="claimIdNumber">ID Number *</label>
+                        <input id="claimIdNumber" type="text" required>
+                    </div>
+                </div>
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                    <div class="form-group">
+                        <label for="claimExp">Expiration Date *</label>
+                        <input id="claimExp" type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="claimIdImage">Upload ID Image *</label>
+                        <input id="claimIdImage" type="file" accept="image/*" required>
+                        <div class="claim-hint">Image is used only to verify your identity for this claim.</div>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <input id="claimConfirm" type="checkbox" required>
+                    <label for="claimConfirm">I confirm this is my valid State-issued ID and consent to verification for this claim.</label>
+                </div>
+            </div>
+            <div class="claim-actions">
+                <button type="button" class="btn-secondary" onclick="closeClaimModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Verify and Submit Claim</button>
+            </div>
+        </form>
+
+        <!-- Step: Pending -->
+        <div id="claimStepPending" style="display:none;">
+            <div class="claim-summary">
+                <div class="claim-spinner"></div>
+                <div>Verifying your State ID...</div>
+                <div class="muted" style="margin-top:8px;">This usually takes a few seconds</div>
+            </div>
+            <div class="claim-actions">
+                <button type="button" class="btn-secondary" onclick="closeClaimModal()">Close</button>
+            </div>
+        </div>
+
+        <!-- Step: Success -->
+        <div id="claimStepSuccess" style="display:none;">
+            <div class="claim-summary">
+                <div class="icon text-success">✓</div>
+                <h3>Verification Successful</h3>
+                <p>Your claim has been submitted to the finder. You may receive a message for handoff details.</p>
+            </div>
+            <div class="claim-actions">
+                <button type="button" class="btn-primary" onclick="closeClaimModal()">Done</button>
+            </div>
+        </div>
+
+        <!-- Step: Failed -->
+        <div id="claimStepFailed" style="display:none;">
+            <div class="claim-summary">
+                <div class="icon text-error">⚠️</div>
+                <h3>Verification Failed</h3>
+                <p>We couldn't verify your State ID. Please check the details and try again.</p>
+            </div>
+            <div class="claim-actions">
+                <button type="button" class="btn-secondary" onclick="retryClaimVerification()">Try Again</button>
+                <button type="button" class="btn-primary" onclick="closeClaimModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

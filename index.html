@@ -9,102 +9,78 @@
 <body>
     <!-- Landing/Auth Section -->
     <div id="auth-section" class="container">
-        <header class="hero-section">
-            <div class="logo">
-                <h1>VeriTrust</h1>
-                <p class="tagline">Secure Identity. Trusted Community.</p>
-            </div>
+        <header class="text-center mb-lg">
+            <h1 style="font-size: 3rem; color: var(--primary-color); margin-bottom: var(--spacing-sm); font-weight: 700;">VeriTrust</h1>
+            <p style="font-size: 1.2rem; color: var(--text-secondary);">Secure Identity. Trusted Community.</p>
         </header>
 
-        <main class="auth-container">
-            <div class="auth-tabs">
-                <button class="tab-btn active" onclick="showLogin()">Login</button>
-                <button class="tab-btn" onclick="showSignup()">Sign Up</button>
+        <!-- Login Section -->
+        <main id="login-section" class="auth-section">
+            <h2>Welcome Back</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group password-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                    <button type="button" class="toggle-visibility" onclick="togglePassword('password', this)">👁️</button>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Log In</button>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </form>
+            
+            <div class="auth-switch">
+                <div class="auth-switch-text">Don't have an account?</div>
+                <button class="auth-switch-btn" onclick="showSignup()">Sign up here</button>
             </div>
+        </main>
 
-            <!-- Login Form -->
-            <div id="login-form" class="auth-form active">
-                <h2>Welcome Back</h2>
-                <form>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group password-field">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" required>
-                        <button type="button"
-                                class="toggle-visibility"
-                                onclick="togglePassword('password', this)"
-                                aria-label="Show password"
-                                title="Show/Hide password">👁️</button>
-                    </div>
-                    <button type="button" class="btn-primary" onclick="login()">Log In</button>
-                    <a href="#" class="forgot-password">Forgot Password?</a>
-                </form>
+        <!-- Signup Section -->
+        <main id="signup-section" class="auth-section hidden">
+            <h2>Create Account</h2>
+            <div class="verification-notice" style="margin-bottom: var(--spacing-lg);">
+                <span>🔒</span>
+                <span>Account verification through secure bank connection required</span>
             </div>
-
-            <!-- Signup Form -->
-            <div id="signup-form" class="auth-form">
-                <h2>Create Account</h2>
-                <p class="verification-notice">
-                    <span class="icon">🔒</span>
-                    Account verification through secure bank connection required
-                </p>
-                <form>
-                    <div class="form-group">
-                        <label for="signup-email">Email</label>
-                        <input type="email" id="signup-email" required>
-                    </div>
-                    <!-- NEW: First/Last Name + Phone -->
-                    <div class="form-group">
-                        <label for="signup-first-name">First Name</label>
-                        <input type="text" id="signup-first-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-last-name">Last Name</label>
-                        <input type="text" id="signup-last-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-phone">Phone Number</label>
-                        <input type="tel" id="signup-phone" placeholder="(555) 555-5555" required>
-                    </div>
-                    <div class="form-group password-field">
-                        <label for="signup-password">Password</label>
-                        <input type="password" id="signup-password" required>
-                        <button type="button"
-                                class="toggle-visibility"
-                                onclick="togglePassword('signup-password', this)"
-                                aria-label="Show password"
-                                title="Show/Hide password">👁️</button>
-                        <div class="password-requirements">
-                            <h4>Password Requirements:</h4>
-                            <ul>
-                                <li id="req-length" class="requirement">At least 8 characters</li>
-                                <li id="req-lowercase" class="requirement">One lowercase letter</li>
-                                <li id="req-uppercase" class="requirement">One uppercase letter</li>
-                                <li id="req-number" class="requirement">One number</li>
-                                <li id="req-special" class="requirement">One special character (!@#$%^&*)</li>
-                            </ul>
-                        </div>
-                        <div class="password-strength"></div>
-                    </div>
-                    <div class="form-group password-field">
-                        <label for="confirm-password">Confirm Password</label>
-                        <input type="password" id="confirm-password" required>
-                        <button type="button"
-                                class="toggle-visibility"
-                                onclick="togglePassword('confirm-password', this)"
-                                aria-label="Show password"
-                                title="Show/Hide password">👁️</button>
-                        <div id="password-match" class="password-match"></div>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="terms" required>
-                        <label for="terms">I agree to use trusted bank verification and <a href="#">privacy policy</a></label>
-                    </div>
-                    <button type="button" class="btn-primary" id="signup-btn" onclick="signup()">Create Account</button>
-                </form>
+            <form onsubmit="signup(event)">
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-first-name">First Name</label>
+                    <input type="text" id="signup-first-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-last-name">Last Name</label>
+                    <input type="text" id="signup-last-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-phone">Phone Number</label>
+                    <input type="tel" id="signup-phone" placeholder="(555) 555-5555" required>
+                </div>
+                <div class="form-group password-field">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                    <button type="button" class="toggle-visibility" onclick="togglePassword('signup-password', this)">👁️</button>
+                </div>
+                <div class="form-group password-field">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" required>
+                    <button type="button" class="toggle-visibility" onclick="togglePassword('confirm-password', this)">👁️</button>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+                    <input type="checkbox" id="terms" required style="width: auto; margin-top: 2px;">
+                    <label for="terms">I agree to use trusted bank verification</label>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            
+            <div class="auth-switch">
+                <div class="auth-switch-text">Already have an account?</div>
+                <button class="auth-switch-btn" onclick="showLogin()">Sign in here</button>
             </div>
         </main>
     </div>
@@ -286,1480 +262,687 @@
         </main>
     </div>
 
-    <!-- App Container for Dashboard, SecureFind, EasyTask -->
-    <div id="app-section" class="app-container" style="display: none;">
+    <!-- App Container -->
+    <div id="app-section" class="app-container hidden">
         <nav class="sidebar">
-            <div class="logo">VeriTrust</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: var(--spacing-xl);">VeriTrust</div>
             <div class="nav-links">
-                <a href="#" class="nav-link" id="nav-dashboard" onclick="showDashboard()">
-                    <span class="icon">🏠</span>Dashboard
+                <a href="#" class="nav-link active" onclick="showPage('dashboard')">
+                    <span>🏠</span>Dashboard
                 </a>
-                <a href="#" class="nav-link" id="nav-securefind" onclick="showSecureFind()">
-                    <span class="icon">🔍</span>SecureFind
+                <a href="#" class="nav-link" onclick="showPage('securefind')">
+                    <span>🔍</span>SecureFind
                 </a>
-                <a href="#" class="nav-link" id="nav-easytask" onclick="showEasyTask()">
-                    <span class="icon">📝</span>EasyTask
+                <a href="#" class="nav-link" onclick="showPage('easytask')">
+                    <span>📝</span>EasyTask
                 </a>
-                <a href="#" class="nav-link" id="nav-messages" onclick="showMessages()">
-                    <span class="icon">💬</span>Messages
+                <a href="#" class="nav-link" onclick="showPage('messages')">
+                    <span>💬</span>Messages
                 </a>
-                <a href="#" class="nav-link" id="nav-profile" onclick="showProfile()">
-                    <span class="icon">👤</span>Profile
+                <a href="#" class="nav-link" onclick="showPage('profile')">
+                    <span>👤</span>Profile
                 </a>
             </div>
         </nav>
 
-        <!-- Dashboard Content -->
-        <div id="dashboard-content" class="page-content">
+        <!-- Page Content Container -->
+        <div class="page-content">
             <header class="top-bar">
-                <h1>Dashboard</h1>
-                <div class="header-actions">
+                <h1 id="page-title">Dashboard</h1>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
                     <div class="verified-badge" id="verifiedBadge">
-                        <span class="badge-icon">✓</span>
+                        <span>✓</span>
                         <span>Verified</span>
                     </div>
-                    <!-- Make bell open notifications -->
-                    <button class="notification-btn" onclick="showNotifications()">🔔</button>
+                    <button onclick="showPage('notifications')">🔔</button>
                     <div class="user-menu">
-                        <!-- Dynamic initials button -->
                         <button class="user-avatar" id="userAvatarBtn" onclick="toggleUserMenu()">--</button>
-                        <div id="userDropdown" class="user-dropdown" style="display: none;">
-                            <button onclick="showProfile(); hideUserMenu()">👤 Profile</button>
+                        <div id="userDropdown" class="user-dropdown hidden">
+                            <button onclick="showPage('profile'); hideUserMenu()">👤 Profile</button>
                             <button onclick="logout(); hideUserMenu()">🚪 Log Out</button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <main class="main-content">
-                <div class="status-card" id="verificationCard">
-                    <div class="card-header">
-                        <h3>Verification Status</h3>
-                        <span class="status-badge verified">Verified</span>
-                    </div>
-                    <div class="card-content">
-                        <p>Your identity has been verified. You can now access all community features.</p>
-                    </div>
-                </div>
-
-                <div class="quick-actions">
-                    <h3>Quick Actions</h3>
-                    <div class="action-grid">
-                        <button class="action-card" onclick="showSecureFind(); showTab('lost')">
-                            <div class="action-icon lost">📱</div>
-                            <h4>Report Lost Item</h4>
-                            <p>Lost something? Let the community help find it</p>
-                        </button>
-                        <button class="action-card" onclick="showSecureFind(); showTab('found')">
-                            <div class="action-icon found">✨</div>
-                            <h4>Report Found Item</h4>
-                            <p>Found something? Help return it to owner</p>
-                        </button>
-                        <button class="action-card" onclick="showEasyTask(); openTaskModal()">
-                            <div class="action-icon task">➕</div>
-                            <h4>Add Task</h4>
-                            <p>Create a new task to stay organized</p>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="summary-section">
-                    <div class="summary-card">
-                        <h3>EasyTask Summary</h3>
-                        <div class="task-stats">
-                            <div class="stat">
-                                <span class="count">5</span>
-                                <span class="label">To-Do</span>
-                            </div>
-                            <div class="stat">
-                                <span class="count">2</span>
-                                <span class="label">In Progress</span>
-                            </div>
-                            <div class="stat">
-                                <span class="count">8</span>
-                                <span class="label">Done</span>
-                            </div>
-                        </div>
-                        <a href="#" onclick="showEasyTask()" class="view-all">View All Tasks →</a>
-                    </div>
-
-                    <div class="summary-card">
-                        <h3>SecureFind Highlights</h3>
-                        <div class="recent-items">
-                            <div class="item-preview">
-                                <div class="item-type lost">Lost</div>
-                                <span>iPhone 15 Pro - Downtown area</span>
-                                <span class="time">2 hours ago</span>
-                            </div>
-                            <div class="item-preview">
-                                <div class="item-type found">Found</div>
-                                <span>Blue Wallet - Central Park</span>
-                                <span class="time">5 hours ago</span>
-                            </div>
-                        </div>
-                        <a href="#" onclick="showSecureFind()" class="view-all">View All Items →</a>
-                    </div>
-                </div>
+            <main class="main-content" id="main-content">
+                <!-- Dynamic content loaded here -->
             </main>
-        </div>
-
-        <!-- SecureFind Content -->
-        <div id="securefind-content" class="page-content" style="display: none;">
-            <header class="top-bar">
-                <button class="back-btn mobile-only" onclick="showDashboard()">← Back</button>
-                <h1>SecureFind</h1>
-                <div class="header-actions">
-                    <div class="verified-badge">
-                        <span class="badge-icon">✓</span>
-                        <span>Verified</span>
-                    </div>
-                    <button class="btn-primary mobile-hide" onclick="alert('Report Lost Item feature coming soon!')">Report Lost</button>
-                    <button class="btn-secondary mobile-hide" onclick="alert('Report Found Item feature coming soon!')">Report Found</button>
-                    <button class="menu-btn mobile-only" onclick="toggleMobileMenu()">☰</button>
-                </div>
-            </header>
-
-            <main class="main-content">
-                <div class="tab-container">
-                    <button class="tab-btn active" onclick="showTab('lost')">Lost Items</button>
-                    <button class="tab-btn" onclick="showTab('found')">Found Items</button>
-                </div>
-
-                <div class="search-section">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search items..." class="search-input">
-                        <button class="search-btn">🔍</button>
-                    </div>
-                    <div class="filters">
-                        <select class="filter-select">
-                            <option>All Locations</option>
-                            <option>Downtown</option>
-                            <option>Uptown</option>
-                            <option>Central Park</option>
-                        </select>
-                        <select class="filter-select">
-                            <option>Last 24 hours</option>
-                            <option>Last week</option>
-                            <option>Last month</option>
-                        </select>
-                        <button class="filter-btn">📍 Map View</button>
-                    </div>
-                </div>
-
-                <div id="lost-tab" class="tab-content active">
-                    <div class="items-grid">
-                        <div class="item-card" onclick="alert('Item details coming soon!')">
-                            <div class="item-image">📱</div>
-                            <div class="item-info">
-                                <h4>iPhone 15 Pro</h4>
-                                <p class="item-location">📍 Downtown Coffee Shop</p>
-                                <p class="item-time">Lost 2 hours ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Electronics</span>
-                                    <span class="tag priority">High Priority</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="item-card">
-                            <div class="item-image">💼</div>
-                            <div class="item-info">
-                                <h4>Black Leather Briefcase</h4>
-                                <p class="item-location">📍 Metro Station</p>
-                                <p class="item-time">Lost 1 day ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Personal Items</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="item-card">
-                            <div class="item-image">🎒</div>
-                            <div class="item-info">
-                                <h4>Blue Backpack</h4>
-                                <p class="item-location">📍 University Campus</p>
-                                <p class="item-time">Lost 3 days ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Bags</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="found-tab" class="tab-content">
-                    <div class="items-grid">
-                        <div class="item-card">
-                            <div class="item-image">👓</div>
-                            <div class="item-info">
-                                <h4>Reading Glasses</h4>
-                                <p class="item-location">📍 Public Library</p>
-                                <p class="item-time">Found 4 hours ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Accessories</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="item-card">
-                            <div class="item-image">💳</div>
-                            <div class="item-info">
-                                <h4>Blue Wallet</h4>
-                                <p class="item-location">📍 Central Park</p>
-                                <p class="item-time">Found 6 hours ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Personal Items</span>
-                                    <span class="tag match">Potential Match</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="item-card">
-                            <div class="item-image">🔑</div>
-                            <div class="item-info">
-                                <h4>Car Keys with Remote</h4>
-                                <p class="item-location">📍 Shopping Mall</p>
-                                <p class="item-time">Found 1 day ago</p>
-                                <div class="item-tags">
-                                    <span class="tag">Keys</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <!-- EasyTask Content -->
-        <div id="easytask-content" class="page-content" style="display: none;">
-            <header class="top-bar">
-                <button class="back-btn mobile-only" onclick="showDashboard()">← Back</button>
-                <h1>EasyTask</h1>
-                <div class="header-actions">
-                    <button class="btn-primary mobile-hide" onclick="openTaskModal()">+ Add Task</button>
-                    <button class="menu-btn mobile-only" onclick="toggleMobileMenu()">☰</button>
-                </div>
-            </header>
-
-            <main class="main-content">
-                <div class="task-controls">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search tasks..." class="search-input">
-                    </div>
-                    <div class="filters">
-                        <select class="filter-select" onchange="filterTasks('status', this.value)">
-                            <option value="">All Status</option>
-                            <option value="todo">To-Do</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
-                        <select class="filter-select" onchange="filterTasks('priority', this.value)">
-                            <option value="">All Priority</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                        <select class="filter-select" onchange="sortTasks(this.value)">
-                            <option value="due-date">Sort by Due Date</option>
-                            <option value="priority">Sort by Priority</option>
-                            <option value="created">Sort by Created</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="task-list">
-                    <div class="task-item high todo" data-task-id="1">
-                        <div class="task-checkbox">
-                            <input type="checkbox" onchange="updateTaskStatus(1, this.checked)">
-                        </div>
-                        <div class="task-content">
-                            <h4>
-                            <p class="task-description">Check SecureFind for potential matches and respond to messages</p>
-                            <div class="task-meta">
-                                <span class="due-date overdue">Due: Today</span>
-                                <span class="priority-badge high">High</span>
-                                <span class="status-badge todo">To-Do</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon" onclick="editTask(1)">✏️</button>
-                            <button class="btn-icon" onclick="deleteTask(1)">🗑️</button>
-                        </div>
-                    </div>
-
-                    <div class="task-item medium in-progress" data-task-id="2">
-                        <div class="task-checkbox">
-                            <input type="checkbox" onchange="updateTaskStatus(2, this.checked)">
-                        </div>
-                        <div class="task-content">
-                            <h4>Complete project presentation</h4>
-                            <p class="task-description">Finish slides and prepare demo for client meeting</p>
-                            <div class="task-meta">
-                                <span class="due-date">Due: Tomorrow</span>
-                                <span class="priority-badge medium">Medium</span>
-                                <span class="status-badge in-progress">In Progress</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon" onclick="editTask(2)">✏️</button>
-                            <button class="btn-icon" onclick="deleteTask(2)">🗑️</button>
-                        </div>
-                    </div>
-
-                    <div class="task-item low todo" data-task-id="3">
-                        <div class="task-checkbox">
-                            <input type="checkbox" onchange="updateTaskStatus(3, this.checked)">
-                        </div>
-                        <div class="task-content">
-                            <h4>Schedule dentist appointment</h4>
-                            <p class="task-description">Call office to book routine cleaning</p>
-                            <div class="task-meta">
-                                <span class="due-date">Due: Next week</span>
-                                <span class="priority-badge low">Low</span>
-                                <span class="status-badge todo">To-Do</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon" onclick="editTask(3)">✏️</button>
-                            <button class="btn-icon" onclick="deleteTask(3)">🗑️</button>
-                        </div>
-                    </div>
-
-                    <div class="task-item high done" data-task-id="4">
-                        <div class="task-checkbox">
-                            <input type="checkbox" checked onchange="updateTaskStatus(4, this.checked)">
-                        </div>
-                        <div class="task-content completed">
-                            <h4>Submit weekly report</h4>
-                            <p class="task-description">Compile and send team progress report</p>
-                            <div class="task-meta">
-                                <span class="due-date">Completed yesterday</span>
-                                <span class="priority-badge high">High</span>
-                                <span class="status-badge done">Done</span>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn-icon" onclick="editTask(4)">✏️</button>
-                            <button class="btn-icon" onclick="deleteTask(4)">🗑️</button>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <!-- Task Modal -->
-        <div id="taskModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalTitle">Add New Task</h3>
-                    <button class="close-btn" onclick="closeTaskModal()">&times;</button>
-                </div>
-                <form id="taskForm">
-                    <div class="form-group">
-                        <label for="taskTitle">Title *</label>
-                        <input type="text" id="taskTitle" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDescription">Description</label>
-                        <textarea id="taskDescription" rows="3"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="taskDueDate">Due Date</label>
-                            <input type="date" id="taskDueDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="taskPriority">Priority</label>
-                            <select id="taskPriority">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskStatus">Status</label>
-                            <select id="taskStatus">
-                                <option value="todo" selected>To-Do</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="done">Done</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Task</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Notification Detail Modal -->
-        <div id="notificationModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="notificationModalTitle">Notification</h3>
-                    <button class="close-btn" onclick="closeNotificationModal()">&times;</button>
-                </div>
-                <div id="notificationModalBody" style="padding: var(--spacing-lg);">
-                    <div id="notifDetailText" class="notif-text"></div>
-                    <div id="notifDetailTime" class="notif-time" style="margin-top: 8px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- NEW: Notifications Page -->
-        <div id="notifications-content" class="page-content" style="display: none;">
-            <header class="top-bar">
-                <button class="back-btn mobile-only" onclick="showDashboard()">← Back</button>
-                <h1>Notifications</h1>
-                <div class="header-actions">
-                    <button class="menu-btn mobile-only" onclick="toggleMobileMenu()">☰</button>
-                </div>
-            </header>
-            <main class="main-content">
-                <div class="notifications-wrapper">
-                    <div class="search-bar">
-                        <input type="text" id="notificationsSearch" class="search-input" placeholder="Search notifications...">
-                    </div>
-                    <!-- Add actions row -->
-                    <div class="actions-row">
-                        <button class="btn-secondary" onclick="markAllNotificationsRead()">Mark all as read</button>
-                    </div>
-                    <div id="notificationsList" class="notifications-list"></div>
-                    <div id="notificationsEmpty" class="empty-state" style="display:none;">
-                        <div class="empty-icon">🔔</div>
-                        <h3>No notifications</h3>
-                        <p>You're all caught up.</p>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <!-- NEW: Messages Page -->
-        <div id="messages-content" class="page-content" style="display: none;">
-            <header class="top-bar">
-                <button class="back-btn mobile-only" onclick="showDashboard()">← Back</button>
-                <h1>Messages</h1>
-                <div class="header-actions">
-                    <button class="menu-btn mobile-only" onclick="toggleMobileMenu()">☰</button>
-                </div>
-            </header>
-            <main class="main-content">
-                <div class="messages-container">
-                    <aside class="messages-sidebar">
-                        <div class="search-bar">
-                            <input type="text" id="messagesSearch" class="search-input" placeholder="Search chats...">
-                        </div>
-                        <button class="btn-primary" onclick="createNewChat()">+ New Chat</button>
-                        <div id="chatList" class="chat-list"></div>
-                    </aside>
-                    <section class="messages-thread">
-                        <div id="threadHeader" class="thread-header">Select a chat</div>
-                        <div id="messagesList" class="messages-list"></div>
-                        <form id="messageForm" class="message-form" onsubmit="sendCurrentMessage(event)">
-                            <input id="messageInput" type="text" placeholder="Type a message..." />
-                            <button class="btn-primary" type="submit">Send</button>
-                        </form>
-                    </section>
-                </div>
-            </main>
-        </div>
-
-        <!-- NEW: Profile Page -->
-        <div id="profile-content" class="page-content" style="display: none;">
-            <header class="top-bar">
-                <button class="back-btn mobile-only" onclick="showDashboard()">← Back</button>
-                <h1>Profile</h1>
-                <div class="header-actions">
-                    <button class="menu-btn mobile-only" onclick="toggleMobileMenu()">☰</button>
-                </div>
-            </header>
-            <main class="main-content">
-                <div class="profile-card">
-                    <div class="profile-row">
-                        <div>
-                            <div class="label">First Name</div>
-                            <div id="profileFirstName" class="value">-</div>
-                        </div>
-                        <div>
-                            <div class="label">Last Name</div>
-                            <div id="profileLastName" class="value">-</div>
-                        </div>
-                    </div>
-                    <div class="profile-row">
-                        <div>
-                            <div class="label">Email</div>
-                            <div id="profileEmail" class="value">-</div>
-                        </div>
-                        <div>
-                            <div class="label">Phone</div>
-                            <div id="profilePhone" class="value">-</div>
-                        </div>
-                    </div>
-                    <div class="profile-hint">Home address and other details can be added later.</div>
-                </div>
-            </main>
-        </div>
-
-        <!-- Mobile Navigation Overlay -->
-        <div id="mobileNavOverlay" class="mobile-nav-overlay" style="display: none;">
-            <div class="mobile-nav-content">
-                <div class="mobile-nav-header">
-                    <span>Navigation</span>
-                    <button class="close-btn" onclick="closeMobileMenu()">×</button>
-                </div>
-                <div class="mobile-nav-links">
-                    <button onclick="showDashboard(); closeMobileMenu()">
-                        <span class="icon">🏠</span>Dashboard
-                    </button>
-                    <button onclick="showSecureFind(); closeMobileMenu()">
-                        <span class="icon">🔍</span>SecureFind
-                    </button>
-                    <button onclick="showEasyTask(); closeMobileMenu()">
-                        <span class="icon">📝</span>EasyTask
-                    </button>
-                    <button onclick="showMessages(); closeMobileMenu()">
-                        <span class="icon">💬</span>Messages
-                    </button>
-                    <button onclick="showNotifications(); closeMobileMenu()">
-                        <span class="icon">🔔</span>Notifications
-                    </button>
-                    <button onclick="showProfile(); closeMobileMenu()">
-                        <span class="icon">👤</span>Profile
-                    </button>
-                    <button onclick="logout(); closeMobileMenu()" class="logout-btn">
-                        <span class="icon">🚪</span>Log Out
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
     <script>
-        // Global state
-        let currentUser = null;
-        let isVerified = false;
-
-        // Password validation state
-        let passwordRequirements = {
-            length: false,
-            lowercase: false,
-            uppercase: false,
-            number: false,
-            special: false
+        // Simplified state management
+        const state = {
+            currentUser: null,
+            isVerified: false,
+            currentPage: 'dashboard'
         };
 
-        // Cookie management functions
+        // Utility functions
+        const $ = id => document.getElementById(id);
+        const show = el => el.classList.remove('hidden');
+        const hide = el => el.classList.add('hidden');
+        const toggle = el => el.classList.toggle('hidden');
+
+        // Cookie management
         function setCookie(name, value, days = 7) {
-            const expires = new Date();
-            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+            document.cookie = `${name}=${JSON.stringify(value)};expires=${expires};path=/;SameSite=Strict`;
         }
 
         function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-            }
-            return null;
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? JSON.parse(match[2]) : null;
         }
 
         function deleteCookie(name) {
             document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
         }
 
-        // Session management
-        function createSession(userData) {
-            const sessionData = {
-                email: userData.email,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                verified: userData.verified,
-                loginTime: new Date().toISOString()
-            };
-            setCookie('veritrustSession', JSON.stringify(sessionData), 7); // 7 days
-            console.log('Session created for:', userData.email);
-        }
-
-        function getSession() {
-            const sessionCookie = getCookie('veritrustSession');
-            if (sessionCookie) {
-                try {
-                    return JSON.parse(sessionCookie);
-                } catch (e) {
-                    console.error('Invalid session cookie:', e);
-                    deleteCookie('veritrustSession');
-                }
-            }
-            return null;
-        }
-
-        function clearSession() {
-            deleteCookie('veritrustSession');
-            console.log('Session cleared');
-        }
-
-        function logout() {
-            clearSession();
-            currentUser = null;
-            isVerified = false;
-            window.currentUser = null;
-            window.isVerified = false;
-            
-            // Return to auth section
-            document.getElementById('app-section').style.display = 'none';
-            document.getElementById('verification-section').style.display = 'none';
-            document.getElementById('auth-section').style.display = 'flex';
-            
-            // Clear login form
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            
-            console.log('User logged out');
-        }
-
-        // Check for existing session on page load
-        function checkExistingSession() {
-            const session = getSession();
-            if (session) {
-                console.log('Found existing session for:', session.email);
-                
-                // Restore user state
-                currentUser = { email: session.email };
-                window.currentUser = currentUser;
-                isVerified = session.verified || false;
-                window.isVerified = isVerified;
-                
-                // Get full user data from localStorage
-                const userData = getUserData();
-                if (userData.email === session.email) {
-                    // Go directly to dashboard
-                    document.getElementById('auth-section').style.display = 'none';
-                    document.getElementById('verification-section').style.display = 'none';
-                    document.getElementById('app-section').style.display = 'flex';
-                    
-                    updateUserAvatarInitials();
-                    showDashboard();
-                    updateVerificationStatus();
-                    
-                    console.log('Session restored successfully');
-                    return true;
-                } else {
-                    // Session email doesn't match stored data, clear session
-                    console.log('Session email mismatch, clearing session');
-                    clearSession();
-                }
-            }
-            return false;
-        }
-
-        // Helpers to read/write user data
-        function getUserData() {
-            return JSON.parse(localStorage.getItem('veritrustUser') || '{}');
-        }
-        function setUserData(data) {
-            localStorage.setItem('veritrustUser', JSON.stringify(data));
-        }
+        // Storage helpers
+        const getUser = () => JSON.parse(localStorage.getItem('veritrustUser') || '{}');
+        const setUser = data => localStorage.setItem('veritrustUser', JSON.stringify(data));
 
         // Auth functions
         function showLogin() {
-            document.getElementById('login-form').classList.add('active');
-            document.getElementById('signup-form').classList.remove('active');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            hide($('signup-section'));
+            show($('login-section'));
+            // Clear signup form
+            $('signup-section').querySelector('form').reset();
         }
 
         function showSignup() {
-            document.getElementById('signup-form').classList.add('active');
-            document.getElementById('login-form').classList.remove('active');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            hide($('login-section'));
+            show($('signup-section'));
+            // Clear login form
+            $('login-section').querySelector('form').reset();
         }
 
-        function login() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+        function login(e) {
+            e.preventDefault();
+            const email = $('email').value.trim();
+            const password = $('password').value;
+            const userData = getUser();
             
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
+            if (!userData.email || userData.email !== email || userData.password !== password) {
+                return alert('Invalid credentials');
             }
             
-            // Get user data from localStorage
-            const userData = getUserData();
-            console.log('Login attempt - stored user data:', userData);
-            
-            // Check if user exists and credentials match
-            if (!userData.email) {
-                alert('No account found. Please sign up first.');
-                return;
-            }
-            
-            if (userData.email !== email) {
-                alert('Email not found. Please check your email or sign up for a new account.');
-                return;
-            }
-            
-            if (userData.password !== password) {
-                alert('Incorrect password. Please try again.');
-                return;
-            }
-
-            // Login successful
-            console.log('Login successful for:', email);
-            currentUser = { email };
-            window.currentUser = currentUser;
-
-            // Update login tracking
-            userData.totalLogins = Number(userData.totalLogins || 0) + 1;
-            userData.loginsSinceFull = Number(userData.loginsSinceFull || 0) + 1;
-            setUserData(userData);
-
-            // Create session cookie
-            createSession(userData);
-
-            // Reset verification status for this session
-            isVerified = false;
-            window.isVerified = false;
-
-            showVerification();
-            decideAndStartVerification();
+            state.currentUser = userData;
+            setCookie('session', { email, verified: userData.verified });
+            startApp();
         }
 
-        function signup() {
-            const email = document.getElementById('signup-email').value.trim();
-            const firstName = document.getElementById('signup-first-name').value.trim();
-            const lastName = document.getElementById('signup-last-name').value.trim();
-            const rawPhone = document.getElementById('signup-phone').value;
-            const phoneDigits = (rawPhone || '').replace(/\D/g, '');
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const termsAccepted = document.getElementById('terms').checked;
-
-            if (!email || !firstName || !lastName || !phoneDigits || !password || !confirmPassword) {
-                alert('Please fill in all fields');
-                return;
+        function signup(e) {
+            e.preventDefault();
+            const email = $('signup-email').value.trim();
+            const firstName = $('signup-first-name').value.trim();
+            const lastName = $('signup-last-name').value.trim();
+            const phone = $('signup-phone').value.trim();
+            const password = $('signup-password').value;
+            const confirmPassword = $('confirm-password').value;
+            const terms = $('terms').checked;
+            
+            if (!email || !firstName || !lastName || !phone || !password || !confirmPassword) {
+                return alert('Please fill in all fields');
             }
-            if (phoneDigits.length < 10) {
-                alert('Please enter a valid phone number (at least 10 digits)');
-                return;
-            }
-            if (!isPasswordValid(password)) {
-                alert('Password does not meet all requirements. Please check the password guidelines.');
-                return;
-            }
+            
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
+                return alert('Passwords do not match');
             }
-            if (!termsAccepted) {
-                alert('Please accept the terms and privacy policy');
-                return;
+            
+            if (!terms) {
+                return alert('Please accept the terms');
             }
-
-            // Check if user already exists
-            const existingUser = getUserData();
-            if (existingUser.email === email) {
-                alert('An account with this email already exists. Please login instead.');
-                showLogin();
-                return;
+            
+            if (getUser().email === email) {
+                return alert('User already exists');
             }
-
-            // Save new user data to localStorage
-            const newUserData = {
+            
+            const userData = {
                 email,
                 firstName,
                 lastName,
-                phone: phoneDigits,
+                phone,
                 password,
                 verified: false,
-                signupDate: new Date().toISOString(),
-                totalLogins: 0,
-                loginsSinceFull: 0,
-                fullVerifCounter: 0,
-                quickVerifCounter: 0
+                signupDate: new Date().toISOString()
             };
             
-            console.log('Saving user data:', newUserData);
-            setUserData(newUserData);
-
-            // Clear form fields
-            document.getElementById('signup-email').value = '';
-            document.getElementById('signup-first-name').value = '';
-            document.getElementById('signup-last-name').value = '';
-            document.getElementById('signup-phone').value = '';
-            document.getElementById('signup-password').value = '';
-            document.getElementById('confirm-password').value = '';
-            document.getElementById('terms').checked = false;
-            resetPasswordValidation();
-
-            alert('Account created successfully! Please login with your new credentials.');
+            setUser(userData);
+            alert('Account created! Please login.');
             showLogin();
-            document.getElementById('email').value = email;
+            $('email').value = email; // Pre-fill email on login form
         }
 
-        // Password validation functions
-        function isPasswordValid(password) {
-            return passwordRequirements.length && 
-                   passwordRequirements.lowercase && 
-                   passwordRequirements.uppercase && 
-                   passwordRequirements.number && 
-                   passwordRequirements.special;
+        // App functions
+        function startApp() {
+            hide($('auth-section'));
+            show($('app-section'));
+            updateUserAvatar();
+            showPage('dashboard');
         }
 
-        function validatePassword(password) {
-            passwordRequirements.length = password.length >= 8;
-            passwordRequirements.lowercase = /[a-z]/.test(password);
-            passwordRequirements.uppercase = /[A-Z]/.test(password);
-            passwordRequirements.number = /[0-9]/.test(password);
-            passwordRequirements.special = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-
-            updatePasswordRequirements();
-            updatePasswordStrength();
-            updateSignupButton();
-        }
-
-        function updatePasswordRequirements() {
-            const requirements = ['length', 'lowercase', 'uppercase', 'number', 'special'];
-            requirements.forEach(req => {
-                const element = document.getElementById(`req-${req}`);
-                if (element) {
-                    if (passwordRequirements[req]) {
-                        element.classList.add('valid');
-                        element.classList.remove('invalid');
-                    } else {
-                        element.classList.add('invalid');
-                        element.classList.remove('valid');
-                    }
-                }
-            });
-        }
-
-        function updatePasswordStrength() {
-            const validCount = Object.values(passwordRequirements).filter(Boolean).length;
-            const strengthElement = document.querySelector('.password-strength');
-            if (!strengthElement) return;
+        function showPage(page) {
+            state.currentPage = page;
+            $('page-title').textContent = page.charAt(0).toUpperCase() + page.slice(1);
             
-            const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-            const colors = ['#D32F2F', '#F59E0B', '#F59E0B', '#2CB1BC', '#2E7D32'];
+            // Update nav
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector(`[onclick="showPage('${page}')"]`).classList.add('active');
             
-            strengthElement.textContent = levels[validCount] || '';
-            strengthElement.style.color = colors[validCount] || '';
-            strengthElement.style.fontWeight = '500';
+            // Load page content
+            loadPageContent(page);
         }
 
-        function checkPasswordMatch() {
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const matchElement = document.getElementById('password-match');
-            
-            if (confirmPassword === '') {
-                matchElement.textContent = '';
-                matchElement.className = 'password-match';
-                return;
-            }
-            
-            if (password === confirmPassword) {
-                matchElement.textContent = '✓ Passwords match';
-                matchElement.className = 'password-match valid';
-            } else {
-                matchElement.textContent = '✗ Passwords do not match';
-                matchElement.className = 'password-match invalid';
-            }
-        }
-
-        function updateSignupButton() {
-            const signupBtn = document.getElementById('signup-btn');
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            
-            if (isPasswordValid(password) && password === confirmPassword && password !== '') {
-                signupBtn.disabled = false;
-                signupBtn.style.opacity = '1';
-            } else {
-                signupBtn.disabled = true;
-                signupBtn.style.opacity = '0.6';
-            }
-        }
-
-        function resetPasswordValidation() {
-            passwordRequirements = {
-                length: false,
-                lowercase: false,
-                uppercase: false,
-                number: false,
-                special: false
+        function loadPageContent(page) {
+            const content = $('main-content');
+            const pages = {
+                dashboard: `
+                    <div class="status-card mb-lg">
+                        <h3>Welcome back!</h3>
+                        <p>Your identity is verified. Access all features securely.</p>
+                    </div>
+                    <div class="action-grid">
+                        <div class="action-card" onclick="showPage('securefind')">
+                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">📱</div>
+                            <h4>Report Lost Item</h4>
+                            <p>Lost something? Let the community help find it</p>
+                        </div>
+                        <div class="action-card" onclick="showPage('easytask')">
+                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">➕</div>
+                            <h4>Add Task</h4>
+                            <p>Create a new task to stay organized</p>
+                        </div>
+                    </div>
+                `,
+                securefind: `
+                    <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                        <input type="text" placeholder="Search items..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                    </div>
+                    <div class="items-grid">
+                        <div class="item-card">
+                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">📱</div>
+                            <h4>iPhone 15 Pro</h4>
+                            <p>📍 Downtown Coffee Shop</p>
+                            <p>Lost 2 hours ago</p>
+                        </div>
+                        <div class="item-card">
+                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">💳</div>
+                            <h4>Blue Wallet</h4>
+                            <p>📍 Central Park</p>
+                            <p>Found 6 hours ago</p>
+                        </div>
+                        <div class="item-card">
+                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">🎒</div>
+                            <h4>Black Backpack</h4>
+                            <p>📍 University Campus</p>
+                            <p>Lost 3 days ago</p>
+                        </div>
+                    </div>
+                `,
+                easytask: `
+                    <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center;">
+                        <button class="btn-primary" onclick="alert('Add task feature coming soon!')">+ Add Task</button>
+                    </div>
+                    <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                        <input type="checkbox">
+                        <div style="flex: 1;">
+                            <h4>Review SecureFind matches</h4>
+                            <p>Check potential matches and respond to messages</p>
+                        </div>
+                    </div>
+                    <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                        <input type="checkbox">
+                        <div style="flex: 1;">
+                            <h4>Update profile information</h4>
+                            <p>Complete your profile details for better verification</p>
+                        </div>
+                    </div>
+                `,
+                messages: `
+                    <div class="messages-container">
+                        <aside class="messages-sidebar">
+                            <button class="new-conversation-btn" onclick="openNewConversationModal()">
+                                + New Conversation
+                            </button>
+                            <div style="margin-bottom: var(--spacing-md);">
+                                <input type="text" id="contactSearch" class="form-group input" placeholder="Search conversations..." style="width: 100%; padding: var(--spacing-sm); border: 2px solid var(--border-color); border-radius: var(--border-radius); margin: 0;">
+                            </div>
+                            <div id="chatList" class="chat-list">
+                                <!-- Chat items will be populated here -->
+                            </div>
+                        </aside>
+                        <section class="messages-thread">
+                            <div id="threadHeader" class="thread-header">
+                                <div class="empty-chat">
+                                    <div class="empty-chat-icon">💬</div>
+                                    <h3>Select a conversation</h3>
+                                    <p>Choose a conversation from the left to start messaging</p>
+                                </div>
+                            </div>
+                            <div id="messagesList" class="messages-list" style="display: none;">
+                                <!-- Messages will be populated here -->
+                            </div>
+                            <form id="messageForm" class="message-form" onsubmit="sendMessage(event)" style="display: none;">
+                                <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                                <button type="submit" class="send-btn" id="sendBtn" disabled>Send</button>
+                            </form>
+                        </section>
+                    </div>
+                    
+                    <!-- New Conversation Modal -->
+                    <div id="newConversationModal" class="new-conversation-modal">
+                        <div class="new-conversation-form">
+                            <h3>Start New Conversation</h3>
+                            <div class="form-group">
+                                <label for="contactNameInput">Search for people</label>
+                                <input type="text" id="contactNameInput" placeholder="Type a name..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                                <div id="contactSuggestions" class="contact-suggestions" style="display: none;">
+                                    <!-- Contact suggestions will be populated here -->
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                                <button type="button" class="btn-secondary" onclick="closeNewConversationModal()">Cancel</button>
+                                <button type="button" class="btn-primary" id="startConversationBtn" onclick="startNewConversation()" disabled>Start Conversation</button>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                profile: `
+                    <div class="profile-card">
+                        <h3 style="text-align: center; margin-bottom: var(--spacing-lg);">Profile Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                            <div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">First Name</div>
+                                <div style="font-weight: 600;">${state.currentUser?.firstName || '-'}</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Last Name</div>
+                                <div style="font-weight: 600;">${state.currentUser?.lastName || '-'}</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                            <div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Email</div>
+                                <div style="font-weight: 600;">${state.currentUser?.email || '-'}</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Status</div>
+                                <div style="font-weight: 600; color: ${state.isVerified ? 'var(--success-color)' : 'var(--warning-color)'};">${state.isVerified ? 'Verified' : 'Pending'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `
             };
-            updatePasswordRequirements();
-            document.querySelector('.password-strength').textContent = '';
-            document.getElementById('password-match').textContent = '';
-            updateSignupButton();
-        }
-
-        // Password visibility toggle
-        function togglePassword(inputId, btnEl) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            const isHidden = input.type === 'password';
-            input.type = isHidden ? 'text' : 'password';
-            btnEl.textContent = isHidden ? '🙈' : '👁️';
-            btnEl.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
-        }
-
-        // Verification functions
-        function showVerification() {
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('verification-section').style.display = 'block';
-            showVerificationStep('verification-start');
-        }
-
-        function showBankForm() {
-            showVerificationStep('verification-form');
-            populateYearDropdown();
-        }
-
-        function populateYearDropdown() {
-            const yearSelect = document.getElementById('account-year');
-            const currentYear = new Date().getFullYear();
             
-            yearSelect.innerHTML = '<option value="">Year</option>';
+            content.innerHTML = pages[page] || '<div class="text-center">Page not found</div>';
             
-            for (let year = currentYear; year >= 1970; year--) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelect.appendChild(option);
+            // Initialize messages if on messages page
+            if (page === 'messages') {
+                initializeMessages();
             }
         }
 
-        function decideAndStartVerification() {
-            const userData = getUserData();
-            const loginsSinceFull = Number(userData.loginsSinceFull || 0);
-            const hasFullVerification = !!userData.bankVerification;
-
-            const requireFull = !hasFullVerification || loginsSinceFull >= 10;
-
-            if (requireFull) {
-                window.lastVerificationMode = 'full';
-                showVerificationStep('verification-start');
-            } else {
-                startQuickVerification();
-            }
-        }
-
-        function startQuickVerification() {
-            window.lastVerificationMode = 'quick';
-            showVerificationStep('quick-verification');
-
-            const userData = getUserData();
-            userData.quickVerifCounter = Number(userData.quickVerifCounter || 0) + 1;
-            setUserData(userData);
-
-            const shouldFail = (userData.quickVerifCounter % 6 === 0);
-
-            setTimeout(() => {
-                if (!shouldFail) {
-                    isVerified = true;
-                    window.isVerified = true;
-                    const updated = getUserData();
-                    updated.verified = true;
-                    updated.lastQuickVerificationDate = new Date().toISOString();
-                    setUserData(updated);
-                    showVerificationStep('verification-success');
-                } else {
-                    showVerificationStep('verification-failed');
+        // Sample message data
+        const messageData = {
+            contacts: [
+                {
+                    id: 'contact1',
+                    name: 'Sarah Johnson',
+                    preview: 'Thanks for helping me find my wallet!',
+                    time: '2 min ago',
+                    messages: [
+                        { text: 'Hi! I saw your post about finding a blue wallet in Central Park', sent: false, time: '10:30 AM' },
+                        { text: 'Yes! I found it near the fountain. Can you describe what was inside?', sent: true, time: '10:32 AM' },
+                        { text: 'It has my driver\'s license and a Chase credit card', sent: false, time: '10:33 AM' },
+                        { text: 'Perfect! That matches. When would you like to meet up?', sent: true, time: '10:35 AM' },
+                        { text: 'Thanks for helping me find my wallet!', sent: false, time: '10:40 AM' }
+                    ]
+                },
+                {
+                    id: 'contact2',
+                    name: 'Mike Chen',
+                    preview: 'Is the iPhone still available?',
+                    time: '1 hour ago',
+                    messages: [
+                        { text: 'Hi, I lost my iPhone in the downtown area. Is it still available?', sent: false, time: '9:15 AM' },
+                        { text: 'Yes it is! Can you tell me the model and color?', sent: true, time: '9:20 AM' },
+                        { text: 'iPhone 15 Pro, blue color with a clear case', sent: false, time: '9:22 AM' },
+                        { text: 'Is the iPhone still available?', sent: false, time: '9:45 AM' }
+                    ]
+                },
+                {
+                    id: 'contact3',
+                    name: 'Alex Rivera',
+                    preview: 'Let me know if you need any other details',
+                    time: '3 hours ago',
+                    messages: [
+                        { text: 'I found a black backpack near the university. Is it yours?', sent: true, time: '7:30 AM' },
+                        { text: 'Yes! That sounds like mine. It has a laptop inside?', sent: false, time: '7:35 AM' },
+                        { text: 'Yes, and some textbooks. Where would you like to meet?', sent: true, time: '7:37 AM' },
+                        { text: 'Let me know if you need any other details', sent: false, time: '7:50 AM' }
+                    ]
                 }
-            }, 1500);
+            ],
+            currentContact: null,
+            availableContacts: [
+                { id: 'new1', name: 'Emma Wilson', context: 'Posted about lost keys in downtown area' },
+                { id: 'new2', name: 'David Lee', context: 'Found a wallet near the metro station' },
+                { id: 'new3', name: 'Lisa Garcia', context: 'Looking for lost phone in Central Park' },
+                { id: 'new4', name: 'Tom Anderson', context: 'Found reading glasses at the library' },
+                { id: 'new5', name: 'Maria Rodriguez', context: 'Posted about missing laptop bag' }
+            ]
+        };
+
+        function initializeMessages() {
+            renderContactList();
+            setupMessageInput();
+            
+            // Auto-expand textarea
+            const messageInput = $('messageInput');
+            if (messageInput) {
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                    
+                    // Enable/disable send button
+                    const sendBtn = $('sendBtn');
+                    sendBtn.disabled = !this.value.trim();
+                });
+                
+                messageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (this.value.trim()) {
+                            sendMessage(e);
+                        }
+                    }
+                });
+            }
         }
 
-        function startVerification() {
-            window.lastVerificationMode = 'full';
-            showVerificationStep('verification-pending');
+        function renderContactList() {
+            const chatList = $('chatList');
+            if (!chatList) return;
+            
+            chatList.innerHTML = messageData.contacts.map(contact => `
+                <div class="chat-item" onclick="selectContact('${contact.id}')">
+                    <div class="chat-name">${contact.name}</div>
+                    <div class="chat-preview">${contact.preview}</div>
+                    <div class="chat-time">${contact.time}</div>
+                </div>
+            `).join('');
+        }
 
-            const userData = getUserData();
-            userData.fullVerifCounter = Number(userData.fullVerifCounter || 0) + 1;
-            setUserData(userData);
+        function selectContact(contactId) {
+            const contact = messageData.contacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            messageData.currentContact = contact;
+            
+            // Update UI
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.chat-item').classList.add('active');
+            
+            // Update thread header
+            const threadHeader = $('threadHeader');
+            threadHeader.innerHTML = `${contact.name}`;
+            threadHeader.className = 'thread-header';
+            
+            // Show messages area and form
+            $('messagesList').style.display = 'flex';
+            $('messageForm').style.display = 'flex';
+            
+            // Render messages
+            renderMessages(contact.messages);
+        }
 
-            const shouldFail = (userData.fullVerifCounter % 6 === 0);
+        function renderMessages(messages) {
+            const messagesList = $('messagesList');
+            if (!messagesList) return;
+            
+            messagesList.innerHTML = messages.map(message => `
+                <div class="message-group ${message.sent ? 'sent' : 'received'}">
+                    <div class="message-bubble">${message.text}</div>
+                    <div class="message-time">${message.time}</div>
+                </div>
+            `).join('');
+            
+            // Scroll to bottom
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
 
+        function sendMessage(e) {
+            e.preventDefault();
+            const messageInput = $('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || !messageData.currentContact) return;
+            
+            // Add message to current contact
+            const newMessage = {
+                text: message,
+                sent: true,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            messageData.currentContact.messages.push(newMessage);
+            
+            // Update contact preview
+            messageData.currentContact.preview = message;
+            messageData.currentContact.time = 'Just now';
+            
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            $('sendBtn').disabled = true;
+            
+            // Re-render
+            renderMessages(messageData.currentContact.messages);
+            renderContactList();
+            
+            // Simulate response after 2 seconds
             setTimeout(() => {
-                if (!shouldFail) {
-                    isVerified = true;
-                    window.isVerified = true;
-
-                    const updated = getUserData();
-                    updated.verified = true;
-                    updated.verificationDate = new Date().toISOString();
-                    updated.bankVerification = {
-                        bankName: document.getElementById('bank-name').value,
-                        accountMonth: document.getElementById('account-month').value,
-                        accountYear: document.getElementById('account-year').value,
-                        accountType: document.getElementById('account-type').value,
-                        zipCode: document.getElementById('zip-code').value,
-                        routingNumber: document.getElementById('routing-number').value,
-                        phoneLast4: document.getElementById('phone-last4').value,
-                        verifiedDate: new Date().toISOString()
+                if (messageData.currentContact) {
+                    const responses = [
+                        "Thanks for the message!",
+                        "Got it, I'll be there soon.",
+                        "Perfect, see you then!",
+                        "Thank you so much for your help!",
+                        "That works for me."
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    const responseMessage = {
+                        text: randomResponse,
+                        sent: false,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     };
-                    updated.loginsSinceFull = 0;
-                    setUserData(updated);
-
-                    showVerificationStep('verification-success');
-                } else {
-                    showVerificationStep('verification-failed');
+                    
+                    messageData.currentContact.messages.push(responseMessage);
+                    messageData.currentContact.preview = randomResponse;
+                    messageData.currentContact.time = 'Just now';
+                    
+                    renderMessages(messageData.currentContact.messages);
+                    renderContactList();
                 }
             }, 2000);
         }
 
-        function showVerificationStep(stepId) {
-            document.querySelectorAll('.verification-step').forEach(step => {
-                step.classList.remove('active');
-            });
-            document.getElementById(stepId).classList.add('active');
-            
-            const steps = document.querySelectorAll('.step');
-            if (stepId === 'verification-pending') {
-                steps[1].classList.add('active');
-                steps[1].classList.remove('completed');
-                steps[2].classList.remove('active');
-            } else if (stepId === 'verification-success') {
-                steps[1].classList.remove('active');
-                steps[1].classList.add('completed');
-                steps[2].classList.add('active');
-            } else if (stepId === 'verification-start') {
-                steps[1].classList.add('active');
-                steps[1].classList.remove('completed');
-                steps[2].classList.remove('active');
-            } else {
-                steps[1].classList.remove('completed');
-                steps[2].classList.remove('active');
+        function setupMessageInput() {
+            const contactSearch = $('contactSearch');
+            if (contactSearch) {
+                contactSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const chatItems = document.querySelectorAll('.chat-item');
+                    
+                    chatItems.forEach(item => {
+                        const name = item.querySelector('.chat-name').textContent.toLowerCase();
+                        const preview = item.querySelector('.chat-preview').textContent.toLowerCase();
+                        
+                        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
             }
         }
 
-        function retryVerification() {
-            if (window.lastVerificationMode === 'quick') {
-                startQuickVerification();
-            } else {
-                showVerificationStep('verification-start');
-            }
+        // New conversation functions
+        let selectedNewContact = null;
+
+        function openNewConversationModal() {
+            $('newConversationModal').classList.add('active');
+            $('contactNameInput').focus();
+            setupContactSearch();
         }
 
-        function skipVerification() {
-            isVerified = false;
-            window.isVerified = false;
-            goToDashboard();
+        function closeNewConversationModal() {
+            $('newConversationModal').classList.remove('active');
+            $('contactNameInput').value = '';
+            $('contactSuggestions').style.display = 'none';
+            $('startConversationBtn').disabled = true;
+            selectedNewContact = null;
         }
 
-        function contactSupport() {
-            alert('Support contact feature coming soon!');
-        }
-
-        function goToDashboard() {
-            document.getElementById('verification-section').style.display = 'none';
-            document.getElementById('app-section').style.display = 'flex';
+        function setupContactSearch() {
+            const contactInput = $('contactNameInput');
+            const suggestions = $('contactSuggestions');
+            const startBtn = $('startConversationBtn');
             
-            // Update session with verification status
-            const session = getSession();
-            if (session) {
-                session.verified = isVerified;
-                setCookie('veritrustSession', JSON.stringify(session), 7);
-            }
-            
-            updateUserAvatarInitials();
-            showDashboard();
-            updateVerificationStatus();
-        }
-
-        // Navigation functions
-        function showDashboard() {
-            hideAllPages();
-            document.getElementById('dashboard-content').style.display = 'block';
-            updateActiveNav('nav-dashboard');
-            updateUserAvatarInitials();
-        }
-
-        function showSecureFind() {
-            hideAllPages();
-            document.getElementById('securefind-content').style.display = 'block';
-            updateActiveNav('nav-securefind');
-        }
-
-        function showEasyTask() {
-            hideAllPages();
-            document.getElementById('easytask-content').style.display = 'block';
-            updateActiveNav('nav-easytask');
-        }
-
-        function showNotifications() {
-            hideAllPages();
-            document.getElementById('notifications-content').style.display = 'block';
-            renderNotifications();
-        }
-
-        function showMessages() {
-            hideAllPages();
-            document.getElementById('messages-content').style.display = 'block';
-            updateActiveNav('nav-messages');
-            initMessagesPage();
-        }
-
-        function showProfile() {
-            hideAllPages();
-            document.getElementById('profile-content').style.display = 'block';
-            updateActiveNav('nav-profile');
-            populateProfile();
-        }
-
-        function hideAllPages() {
-            document.querySelectorAll('.page-content').forEach(page => {
-                page.style.display = 'none';
+            contactInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                if (searchTerm.length === 0) {
+                    suggestions.style.display = 'none';
+                    startBtn.disabled = true;
+                    selectedNewContact = null;
+                    return;
+                }
+                
+                const filteredContacts = messageData.availableContacts.filter(contact => 
+                    contact.name.toLowerCase().includes(searchTerm) &&
+                    !messageData.contacts.find(existing => existing.name === contact.name)
+                );
+                
+                if (filteredContacts.length > 0) {
+                    suggestions.innerHTML = filteredContacts.map(contact => `
+                        <div class="contact-suggestion" onclick="selectNewContact('${contact.id}')">
+                            <div class="suggestion-name">${contact.name}</div>
+                            <div class="suggestion-context">${contact.context}</div>
+                        </div>
+                    `).join('');
+                    suggestions.style.display = 'block';
+                } else {
+                    suggestions.innerHTML = '<div class="contact-suggestion" style="color: var(--text-secondary); cursor: default;">No contacts found</div>';
+                    suggestions.style.display = 'block';
+                }
             });
         }
 
-        function updateActiveNav(activeId) {
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            document.getElementById(activeId).classList.add('active');
-        }
-
-        function updateVerificationStatus() {
-            const verificationCard = document.getElementById('verificationCard');
-            const verifiedBadge = document.getElementById('verifiedBadge');
+        function selectNewContact(contactId) {
+            const contact = messageData.availableContacts.find(c => c.id === contactId);
+            if (!contact) return;
             
-            if (isVerified) {
-                verificationCard.innerHTML = `
-                    <div class="card-header">
-                        <h3>Verification Status</h3>
-                        <span class="status-badge verified">Verified</span>
-                    </div>
-                    <div class="card-content">
-                        <p>Your identity has been verified. You can now access all community features.</p>
-                    </div>
-                `;
-                verifiedBadge.style.display = 'flex';
-            } else {
-                verificationCard.innerHTML = `
-                    <div class="card-header">
-                        <h3>Verification Status</h3>
-                        <span class="status-badge" style="background: var(--warning-color); color: white;">Pending</span>
-                    </div>
-                    <div class="card-content">
-                        <p>Complete your identity verification to access all features.</p>
-                        <button class="btn-primary" onclick="showVerificationFromDashboard()">Complete Verification</button>
-                    </div>
-                `;
-                verifiedBadge.style.display = 'none';
-            }
+            selectedNewContact = contact;
+            $('contactNameInput').value = contact.name;
+            $('contactSuggestions').style.display = 'none';
+            $('startConversationBtn').disabled = false;
         }
 
-        function showVerificationFromDashboard() {
-            document.getElementById('app-section').style.display = 'none';
-            document.getElementById('verification-section').style.display = 'block';
-            showVerificationStep('verification-start');
+        function startNewConversation() {
+            if (!selectedNewContact) return;
+            
+            // Create new conversation
+            const newConversation = {
+                id: 'contact_' + Date.now(),
+                name: selectedNewContact.name,
+                preview: 'New conversation',
+                time: 'Just now',
+                messages: []
+            };
+            
+            // Add to contacts list
+            messageData.contacts.unshift(newConversation);
+            
+            // Remove from available contacts
+            messageData.availableContacts = messageData.availableContacts.filter(
+                c => c.id !== selectedNewContact.id
+            );
+            
+            // Close modal
+            closeNewConversationModal();
+            
+            // Re-render contact list
+            renderContactList();
+            
+            // Auto-select the new conversation
+            selectContact(newConversation.id);
         }
 
-        // User profile functions
-        function computeInitials(first, last, email) {
-            const f = (first || '').trim();
-            const l = (last || '').trim();
-            if (f || l) {
-                return ((f[0] || '') + (l[0] || '')).toUpperCase() || '--';
+        // Helper functions
+        function togglePassword(inputId, btn) {
+            const input = $(inputId);
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.textContent = isPassword ? '🙈' : '👁️';
+        }
+
+        function updateUserAvatar() {
+            const user = state.currentUser;
+            if (user && user.firstName && user.lastName) {
+                $('userAvatarBtn').textContent = (user.firstName[0] + user.lastName[0]).toUpperCase();
             }
-            return (email && email[0]) ? email[0].toUpperCase() : '--';
         }
 
         function toggleUserMenu() {
-            const dropdown = document.getElementById('userDropdown');
-            if (dropdown.style.display === 'none' || dropdown.style.display === '') {
-                dropdown.style.display = 'block';
-            } else {
-                dropdown.style.display = 'none';
-            }
+            toggle($('userDropdown'));
         }
 
         function hideUserMenu() {
-            document.getElementById('userDropdown').style.display = 'none';
+            hide($('userDropdown'));
         }
 
-        function showUserMenu() {
-            document.getElementById('userDropdown').style.display = 'block';
-        }
-
-        function updateUserAvatarInitials() {
-            const user = getUserData();
-            const btn = document.getElementById('userAvatarBtn');
-            if (btn) {
-                btn.textContent = computeInitials(user.firstName, user.lastName, user.email);
-                // Keep onclick as toggleUserMenu
-                btn.onclick = toggleUserMenu;
-            }
-        }
-
-        function populateProfile() {
-            const u = getUserData();
-            document.getElementById('profileFirstName').textContent = u.firstName || '-';
-            document.getElementById('profileLastName').textContent = u.lastName || '-';
-            document.getElementById('profileEmail').textContent = u.email || '-';
-            document.getElementById('profilePhone').textContent = u.phone || '-';
-        }
-
-        // SecureFind functions
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // EasyTask functions
-        function openTaskModal() {
-            document.getElementById('taskModal').classList.add('active');
-        }
-
-        function closeTaskModal() {
-            document.getElementById('taskModal').classList.remove('active');
-            document.getElementById('taskForm').reset();
-        }
-
-        function updateTaskStatus(taskId, completed) {
-            console.log(`Task ${taskId} status updated: ${completed ? 'completed' : 'pending'}`);
-        }
-        function editTask(taskId) {
-            console.log(`Edit task ${taskId}`);
-            openTaskModal();
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('Are you sure you want to delete this task?')) {
-                console.log(`Delete task ${taskId}`);
-            }
-        }
-
-        function filterTasks(type, value) {
-            console.log(`Filter tasks by ${type}: ${value}`);
-        }
-
-        function sortTasks(value) {
-            console.log(`Sort tasks by: ${value}`);
-        }
-
-        // Mobile navigation functions
-        function toggleMobileMenu() {
-            const overlay = document.getElementById('mobileNavOverlay');
-            overlay.style.display = overlay.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        function closeMobileMenu() {
-            document.getElementById('mobileNavOverlay').style.display = 'none';
-        }
-
-        function showMobileMenu() {
-            document.getElementById('mobileNavOverlay').style.display = 'flex';
-        }
-
-        // Notifications functions
-        function getNotifications() {
-            const raw = localStorage.getItem('veritrustNotifications');
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    parsed.forEach(n => { if (typeof n.read === 'undefined') n.read = false; });
-                    return parsed;
-                } catch {
-                    localStorage.removeItem('veritrustNotifications');
-                }
-            }
-            const seed = [
-                { id: 'n1', text: 'Your identity verification was successful.', time: new Date().toISOString(), read: false },
-                { id: 'n2', text: 'New potential match in SecureFind: Blue Wallet.', time: new Date().toISOString(), read: false },
-                { id: 'n3', text: 'Reminder: Complete your profile details.', time: new Date().toISOString(), read: false }
-            ];
-            localStorage.setItem('veritrustNotifications', JSON.stringify(seed));
-            return seed;
-        }
-
-        function saveNotifications(items) {
-            localStorage.setItem('veritrustNotifications', JSON.stringify(items));
-        }
-
-        function markNotificationRead(id) {
-            const items = getNotifications();
-            const n = items.find(x => x.id === id);
-            if (n && !n.read) {
-                n.read = true;
-                saveNotifications(items);
-                renderNotifications();
-            }
-        }
-
-        function markAllNotificationsRead() {
-            const items = getNotifications();
-            let changed = false;
-            items.forEach(n => {
-                if (!n.read) { n.read = true; changed = true; }
-            });
-            if (changed) saveNotifications(items);
-            renderNotifications();
-        }
-
-        function renderNotifications() {
-            const listEl = document.getElementById('notificationsList');
-            const emptyEl = document.getElementById('notificationsEmpty');
-            const search = (document.getElementById('notificationsSearch')?.value || '').toLowerCase();
-            const items = getNotifications().filter(n => n.text.toLowerCase().includes(search));
-
-            listEl.innerHTML = items.map(n => `
-                <div class="notification-item ${n.read ? 'read' : ''}" role="button" tabindex="0" onclick="openNotification('${n.id}')">
-                    <span class="notif-unread-dot" ${n.read ? 'style="display:none;"' : ''}></span>
-                    <div class="notif-text">${n.text}</div>
-                    <div class="notif-time">${new Date(n.time).toLocaleString()}</div>
-                    ${n.read ? '' : `<span class="notif-mark-btn" onclick="event.stopPropagation(); markNotificationRead('${n.id}')">Mark read</span>`}
-                </div>
-            `).join('');
-
-            emptyEl.style.display = items.length ? 'none' : 'block';
-        }
-
-        function openNotification(id) {
-            const items = getNotifications();
-            const n = items.find(x => x.id === id);
-            if (!n) return;
-
-            // Populate modal
-            document.getElementById('notifDetailText').textContent = n.text;
-            document.getElementById('notifDetailTime').textContent = new Date(n.time).toLocaleString();
-
-            // Mark as read and persist
-            if (!n.read) {
-                n.read = true;
-                saveNotifications(items);
-                renderNotifications();
-            }
-
-            // Show modal centered
-            document.getElementById('notificationModal').classList.add('active');
-        }
-
-        function closeNotificationModal() {
-            document.getElementById('notificationModal').classList.remove('active');
-        }
-
-        // Event listeners
+        // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('signup-password');
-            const confirmPasswordInput = document.getElementById('confirm-password');
-            
-            if (passwordInput) {
-                passwordInput.addEventListener('input', function() {
-                    validatePassword(this.value);
-                    checkPasswordMatch();
-                });
+            const session = getCookie('session');
+            if (session) {
+                const userData = getUser();
+                if (userData.email === session.email) {
+                    state.currentUser = userData;
+                    state.isVerified = session.verified;
+                    startApp();
+                    return;
+                }
             }
             
-            if (confirmPasswordInput) {
-                confirmPasswordInput.addEventListener('input', function() {
-                    checkPasswordMatch();
-                    updateSignupButton();
-                });
-            }
-
-            // Task form handler
-            document.getElementById('taskForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('Task saved');
-                closeTaskModal();
-            });
-
-            // Bank verification form handler
-            const bankForm = document.getElementById('bankVerificationForm');
-            if (bankForm) {
-                bankForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const requiredFields = ['bank-name', 'account-month', 'account-year', 'account-type', 'zip-code', 'routing-number', 'phone-last4'];
-                    let allValid = true;
-                    
-                    requiredFields.forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (!field.value.trim()) {
-                            allValid = false;
-                            field.style.borderColor = 'var(--error-color)';
-                        } else {
-                            field.style.borderColor = 'var(--border-color)';
-                        }
-                    });
-                    
-                    const zipCode = document.getElementById('zip-code').value;
-                    if (!/^\d{5}$/.test(zipCode)) {
-                        allValid = false;
-                        document.getElementById('zip-code').style.borderColor = 'var(--error-color)';
-                        alert('Please enter a valid 5-digit ZIP code');
-                        return;
-                    }
-                    
-                    const routingNumber = document.getElementById('routing-number').value;
-                    if (!/^\d{9}$/.test(routingNumber)) {
-                        allValid = false;
-                        document.getElementById('routing-number').style.borderColor = 'var(--error-color)';
-                        alert('Please enter a valid 9-digit routing number');
-                        return;
-                    }
-                    
-                    const phoneLast4 = document.getElementById('phone-last4').value;
-                    if (!/^\d{4}$/.test(phoneLast4)) {
-                        allValid = false;
-                        document.getElementById('phone-last4').style.borderColor = 'var(--error-color)';
-                        alert('Please enter the last 4 digits of your phone number');
-                        return;
-                    }
-                    
-                    if (allValid) {
-                        startVerification();
-                    } else {
-                        alert('Please fill in all required fields correctly');
-                    }
-                });
-            }
-
-            // Notifications search
-            const nSearch = document.getElementById('notificationsSearch');
-            if (nSearch) nSearch.oninput = renderNotifications;
-
-            // Close modals on background click
-            window.onclick = function(event) {
-                const taskModal = document.getElementById('taskModal');
-                const notifModal = document.getElementById('notificationModal');
-                if (event.target === taskModal) closeTaskModal();
-                if (event.target === notifModal) closeNotificationModal();
-            }
-
-            // Check for existing session on page load
-            if (!checkExistingSession()) {
-                // No existing session, show auth section
-                document.getElementById('auth-section').style.display = 'flex';
-            }
-
-            // Close user dropdown when clicking outside
-            document.addEventListener('click', function(event) {
-                const userMenu = document.querySelector('.user-menu');
-                const dropdown = document.getElementById('userDropdown');
-                const mobileNav = document.getElementById('mobileNavOverlay');
-                
-                if (userMenu && !userMenu.contains(event.target)) {
-                    dropdown.style.display = 'none';
+            // Show login section by default
+            showLogin();
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.user-menu')) {
+                    hide($('userDropdown'));
                 }
                 
-                // Close mobile nav when clicking outside
-                if (mobileNav && event.target === mobileNav) {
-                    closeMobileMenu();
+                // Close new conversation modal when clicking outside
+                const modal = $('newConversationModal');
+                if (modal && e.target === modal) {
+                    closeNewConversationModal();
+                }
+            });
+            
+            // Handle escape key for modals
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = $('newConversationModal');
+                    if (modal && modal.classList.contains('active')) {
+                        closeNewConversationModal();
+                    }
                 }
             });
         });

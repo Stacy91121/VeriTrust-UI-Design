@@ -327,11 +327,146 @@
             currentPage: 'dashboard'
         };
 
+        // Sample data for dashboard widgets (define early)
+        const dashboardData = {
+            recentSecureFindItems: [
+                {
+                    id: 'item1',
+                    title: 'iPhone 15 Pro',
+                    location: 'Downtown Coffee Shop',
+                    status: 'lost',
+                    time: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                    icon: '📱',
+                    priority: 'high'
+                },
+                {
+                    id: 'item2',
+                    title: 'Blue Wallet',
+                    location: 'Central Park',
+                    status: 'found',
+                    time: new Date(Date.now() - 6 * 60 * 60 * 1000),
+                    icon: '💳',
+                    priority: 'medium'
+                },
+                {
+                    id: 'item3',
+                    title: 'Black Backpack',
+                    location: 'University Campus',
+                    status: 'lost',
+                    time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+                    icon: '🎒',
+                    priority: 'low'
+                },
+                {
+                    id: 'item4',
+                    title: 'Reading Glasses',
+                    location: 'Public Library',
+                    status: 'found',
+                    time: new Date(Date.now() - 4 * 60 * 60 * 1000),
+                    icon: '👓',
+                    priority: 'low'
+                }
+            ],
+            upcomingTasks: [
+                {
+                    id: 'task1',
+                    title: 'Review SecureFind matches',
+                    description: 'Check potential matches and respond to messages',
+                    dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000),
+                    priority: 'high',
+                    completed: false
+                },
+                {
+                    id: 'task2',
+                    title: 'Complete profile verification',
+                    description: 'Add additional verification details',
+                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                    priority: 'medium',
+                    completed: false
+                },
+                {
+                    id: 'task3',
+                    title: 'Update contact information',
+                    description: 'Verify phone number and address',
+                    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                    priority: 'low',
+                    completed: false
+                },
+                {
+                    id: 'task4',
+                    title: 'Schedule dentist appointment',
+                    description: 'Call office to book routine cleaning',
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                    priority: 'low',
+                    completed: true
+                }
+            ]
+        };
+
+        // Sample notification data
+        const notificationData = {
+            notifications: [
+                {
+                    id: 'notif1',
+                    type: 'match',
+                    title: 'Potential Match Found',
+                    text: 'Your lost iPhone 15 Pro may have been found! Sarah Johnson posted a matching item in Central Park.',
+                    time: new Date(Date.now() - 10 * 60 * 1000),
+                    read: false,
+                    actionable: true
+                },
+                {
+                    id: 'notif2',
+                    type: 'message',
+                    title: 'New Message',
+                    text: 'Mike Chen sent you a message about the blue wallet you found.',
+                    time: new Date(Date.now() - 2 * 60 * 60 * 1000),
+                    read: false,
+                    actionable: true
+                },
+                {
+                    id: 'notif3',
+                    type: 'task',
+                    title: 'Task Reminder',
+                    text: 'Don\'t forget to complete your profile verification.',
+                    time: new Date(Date.now() - 6 * 60 * 60 * 1000),
+                    read: true,
+                    actionable: false
+                }
+            ]
+        };
+
+        // Sample message data
+        const messageData = {
+            contacts: [
+                {
+                    id: 'contact1',
+                    name: 'Sarah Johnson',
+                    preview: 'Thanks for helping me find my wallet!',
+                    time: '2 min ago',
+                    messages: [
+                        { text: 'Hi! I saw your post about finding a blue wallet in Central Park', sent: false, time: '10:30 AM' },
+                        { text: 'Yes! I found it near the fountain. Can you describe what was inside?', sent: true, time: '10:32 AM' },
+                        { text: 'Perfect! That matches. When would you like to meet up?', sent: true, time: '10:35 AM' },
+                        { text: 'Thanks for helping me find my wallet!', sent: false, time: '10:40 AM' }
+                    ]
+                }
+            ],
+            currentContact: null,
+            availableContacts: [
+                { id: 'new1', name: 'Emma Wilson', context: 'Posted about lost keys in downtown area' },
+                { id: 'new2', name: 'David Lee', context: 'Found a wallet near the metro station' }
+            ]
+        };
+
+        // Claim state
+        const claimState = { itemId: null };
+
         // Utility functions
         const $ = id => document.getElementById(id);
-        const show = el => el.classList.remove('hidden');
-        const hide = el => el.classList.add('hidden');
-        const toggle = el => el.classList.toggle('hidden');
+        const show = el => el?.classList.remove('hidden');
+        const hide = el => el?.classList.add('hidden');
+        const toggle = el => el?.classList.toggle('hidden');
 
         // Cookie management
         function setCookie(name, value, days = 7) {
@@ -424,1048 +559,162 @@
             $('email').value = email; // Pre-fill email on login form
         }
 
-        // App functions
-        function startApp() {
-            hide($('auth-section'));
+        // Add missing verification functions
+        function logout() {
+            deleteCookie('session');
+            state.currentUser = null;
+            state.isVerified = false;
+            hide($('app-section'));
+            hide($('verification-section'));
+            show($('auth-section'));
+            showLogin();
+        }
+
+        function showBankForm() {
+            showVerificationStep('verification-form');
+            populateYearDropdown();
+        }
+
+        function populateYearDropdown() {
+            const yearSelect = $('account-year');
+            if (!yearSelect) return;
+            
+            const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '<option value="">Year</option>';
+            
+            for (let year = currentYear; year >= 1970; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function showVerificationStep(stepId) {
+            document.querySelectorAll('.verification-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            const targetStep = $(stepId);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+        }
+
+        function skipVerification() {
+            state.isVerified = false;
+            goToDashboard();
+        }
+
+        function goToDashboard() {
+            hide($('verification-section'));
             show($('app-section'));
             updateUserAvatar();
             showPage('dashboard');
         }
 
-        function showPage(page) {
-            state.currentPage = page;
-            $('page-title').textContent = page.charAt(0).toUpperCase() + page.slice(1);
-            
-            // Update nav
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            document.querySelector(`[onclick="showPage('${page}')"]`).classList.add('active');
-            
-            // Load page content
-            loadPageContent(page);
+        function retryVerification() {
+            showVerificationStep('verification-start');
         }
 
-        function loadPageContent(page) {
-            const content = $('main-content');
-            const pages = {
-                dashboard: `
-                    <div class="status-card mb-lg">
-                        <h3>Welcome back, ${state.currentUser?.firstName || 'User'}!</h3>
-                        <p>Your identity is verified. Access all features securely.</p>
-                    </div>
-                    
-                    <div class="action-grid">
-                        <div class="action-card" onclick="showPage('securefind')">
-                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">📱</div>
-                            <h4>Report Lost Item</h4>
-                            <p>Lost something? Let the community help find it</p>
-                        </div>
-                        <div class="action-card" onclick="showPage('easytask')">
-                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">➕</div>
-                            <h4>Add Task</h4>
-                            <p>Create a new task to stay organized</p>
-                        </div>
-                        <div class="action-card" onclick="showPage('messages')">
-                            <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">💬</div>
-                            <h4>Messages</h4>
-                            <p>Check your conversations and updates</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-widgets">
-                        <div class="widget-card">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Recent SecureFind Activity</h3>
-                                <a href="#" class="widget-view-all" onclick="showPage('securefind')">View All →</a>
-                            </div>
-                            <div class="widget-content" id="securefind-widget">
-                                <!-- Will be populated by renderSecureFindWidget -->
-                            </div>
-                        </div>
-
-                        <div class="widget-card">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Upcoming Tasks</h3>
-                                <a href="#" class="widget-view-all" onclick="showPage('easytask')">View All →</a>
-                            </div>
-                            <div class="widget-content" id="tasks-widget">
-                                <!-- Will be populated by renderTasksWidget -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-widgets" style="margin-top: var(--spacing-lg);">
-                        <div class="widget-card">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Quick Stats</h3>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); text-align: center;">
-                                <div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">${dashboardData.recentSecureFindItems.filter(item => item.status === 'lost').length}</div>
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Lost Items</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">${dashboardData.recentSecureFindItems.filter(item => item.status === 'found').length}</div>
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Found Items</div>
-                                </div>
-                                <div>
-                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning-color);">${dashboardData.upcomingTasks.filter(task => !task.completed).length}</div>
-                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Pending Tasks</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="widget-card">
-                            <div class="widget-header">
-                                <h3 class="widget-title">Recent Notifications</h3>
-                                <a href="#" class="widget-view-all" onclick="showPage('notifications')">View All →</a>
-                            </div>
-                            <div class="widget-content" id="notifications-widget">
-                                <!-- Will be populated by renderNotificationsWidget -->
-                            </div>
-                        </div>
-                    </div>
-                `,
-                securefind: `
-                    <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
-                        <input type="text" placeholder="Search items..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
-                    </div>
-                    <div class="items-grid">
-                        <div class="item-card">
-                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">📱</div>
-                            <h4>iPhone 15 Pro</h4>
-                            <p>📍 Downtown Coffee Shop</p>
-                            <p>Lost 2 hours ago</p>
-                        </div>
-                        <div class="item-card">
-                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">💳</div>
-                            <h4>Blue Wallet</h4>
-                            <p>📍 Central Park</p>
-                            <p>Found 6 hours ago</p>
-                            <div style="margin-top: var(--spacing-sm);">
-                                <button class="btn-secondary" onclick="openClaimModal('item2')">Claim Item</button>
-                            </div>
-                        </div>
-                        <div class="item-card">
-                            <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">🎒</div>
-                            <h4>Black Backpack</h4>
-                            <p>📍 University Campus</p>
-                            <p>Lost 3 days ago</p>
-                        </div>
-                    </div>
-                `,
-                easytask: `
-                    <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center;">
-                        <button class="btn-primary" onclick="alert('Add task feature coming soon!')">+ Add Task</button>
-                    </div>
-                    <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
-                        <input type="checkbox">
-                        <div style="flex: 1;">
-                            <h4>Review SecureFind matches</h4>
-                            <p>Check potential matches and respond to messages</p>
-                        </div>
-                    </div>
-                    <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md); margin-top: var(--spacing-md);">
-                        <input type="checkbox">
-                        <div style="flex: 1;">
-                            <h4>Update profile information</h4>
-                            <p>Complete your profile details for better verification</p>
-                        </div>
-                    </div>
-                `,
-                messages: `
-                    <div class="messages-container">
-                        <aside class="messages-sidebar">
-                            <button class="new-conversation-btn" onclick="openNewConversationModal()">
-                                + New Conversation
-                            </button>
-                            <div style="margin-bottom: var(--spacing-md);">
-                                <input type="text" id="contactSearch" class="form-group input" placeholder="Search conversations..." style="width: 100%; padding: var(--spacing-sm); border: 2px solid var(--border-color); border-radius: var(--border-radius); margin: 0;">
-                            </div>
-                            <div id="chatList" class="chat-list">
-                                <!-- Chat items will be populated here -->
-                            </div>
-                        </aside>
-                        <section class="messages-thread">
-                            <div id="threadHeader" class="thread-header">
-                                <div class="empty-chat">
-                                    <div class="empty-chat-icon">💬</div>
-                                    <h3>Select a conversation</h3>
-                                    <p>Choose a conversation from the left to start messaging</p>
-                                </div>
-                            </div>
-                            <div id="messagesList" class="messages-list" style="display: none;">
-                                <!-- Messages will be populated here -->
-                            </div>
-                            <form id="messageForm" class="message-form" onsubmit="sendMessage(event)" style="display: none;">
-                                <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
-                                <button type="submit" class="send-btn" id="sendBtn" disabled>Send</button>
-                            </form>
-                        </section>
-                    </div>
-                    
-                    <!-- New Conversation Modal -->
-                    <div id="newConversationModal" class="new-conversation-modal">
-                        <div class="new-conversation-form">
-                            <h3>Start New Conversation</h3>
-                            <div class="form-group">
-                                <label for="contactNameInput">Search for people</label>
-                                <input type="text" id="contactNameInput" placeholder="Type a name..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
-                                <div id="contactSuggestions" class="contact-suggestions" style="display: none;">
-                                    <!-- Contact suggestions will be populated here -->
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
-                                <button type="button" class="btn-secondary" onclick="closeNewConversationModal()">Cancel</button>
-                                <button type="button" class="btn-primary" id="startConversationBtn" onclick="startNewConversation()" disabled>Start Conversation</button>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                profile: `
-                    <div class="profile-card">
-                        <h3 style="text-align: center; margin-bottom: var(--spacing-lg);">Profile Information</h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
-                            <div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">First Name</div>
-                                <div style="font-weight: 600;">${state.currentUser?.firstName || '-'}</div>
-                            </div>
-                            <div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Last Name</div>
-                                <div style="font-weight: 600;">${state.currentUser?.lastName || '-'}</div>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
-                            <div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Email</div>
-                                <div style="font-weight: 600;">${state.currentUser?.email || '-'}</div>
-                            </div>
-                            <div>
-                                <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Status</div>
-                                <div style="font-weight: 600; color: ${state.isVerified ? 'var(--success-color)' : 'var(--warning-color)'};">${state.isVerified ? 'Verified' : 'Pending'}</div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                notifications: `
-                    <div class="notifications-wrapper">
-                        <div class="notifications-header">
-                            <div>
-                                <h3>Notifications</h3>
-                                <p id="unreadCount" style="color: var(--text-secondary); margin-top: var(--spacing-xs);"></p>
-                            </div>
-                            <div class="notifications-actions">
-                                <button class="btn-secondary" onclick="markAllNotificationsRead()">Mark All Read</button>
-                                <button class="btn-secondary" onclick="clearReadNotifications()">Clear Read</button>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: var(--spacing-md);">
-                            <input type="text" id="notificationSearch" placeholder="Search notifications..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
-                        </div>
-                        <div id="notificationsList" class="notifications-list">
-                            <!-- Notifications will be populated here -->
-                        </div>
-                        <div id="emptyNotifications" class="empty-notifications" style="display: none;">
-                            <div class="empty-notifications-icon">🔔</div>
-                            <h3>No notifications</h3>
-                            <p>You're all caught up!</p>
-                        </div>
-                    </div>
-                `
-            };
-            
-            content.innerHTML = pages[page] || '<div class="text-center">Page not found</div>';
-            
-            // Initialize page-specific functionality
-            if (page === 'messages') {
-                initializeMessages();
-            } else if (page === 'notifications') {
-                initializeNotifications();
-            } else if (page === 'dashboard') {
-                initializeDashboard();
-            }
+        function contactSupport() {
+            alert('Support contact feature coming soon!');
         }
 
-        // Sample data for dashboard widgets
-        const dashboardData = {
-            recentSecureFindItems: [
-                {
-                    id: 'item1',
-                    title: 'iPhone 15 Pro',
-                    location: 'Downtown Coffee Shop',
-                    status: 'lost',
-                    time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-                    icon: '📱',
-                    priority: 'high'
-                },
-                {
-                    id: 'item2',
-                    title: 'Blue Wallet',
-                    location: 'Central Park',
-                    status: 'found',
-                    time: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-                    icon: '💳',
-                    priority: 'medium'
-                },
-                {
-                    id: 'item3',
-                    title: 'Black Backpack',
-                    location: 'University Campus',
-                    status: 'lost',
-                    time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-                    icon: '🎒',
-                    priority: 'low'
-                },
-                {
-                    id: 'item4',
-                    title: 'Reading Glasses',
-                    location: 'Public Library',
-                    status: 'found',
-                    time: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-                    icon: '👓',
-                    priority: 'low'
-                }
-            ],
-            upcomingTasks: [
-                {
-                    id: 'task1',
-                    title: 'Review SecureFind matches',
-                    description: 'Check potential matches and respond to messages',
-                    dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
-                    priority: 'high',
-                    completed: false
-                },
-                {
-                    id: 'task2',
-                    title: 'Complete profile verification',
-                    description: 'Add additional verification details',
-                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day from now
-                    priority: 'medium',
-                    completed: false
-                },
-                {
-                    id: 'task3',
-                    title: 'Update contact information',
-                    description: 'Verify phone number and address',
-                    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-                    priority: 'low',
-                    completed: false
-                },
-                {
-                    id: 'task4',
-                    title: 'Schedule dentist appointment',
-                    description: 'Call office to book routine cleaning',
-                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-                    priority: 'low',
-                    completed: true
-                }
-            ]
-        };
-
-        // Dashboard widget functions
-        function initializeDashboard() {
-            renderSecureFindWidget();
-            renderTasksWidget();
-            renderNotificationsWidget();
-        }
-
-        function renderSecureFindWidget() {
-            const widget = $('securefind-widget');
-            if (!widget) return;
-
-            const recentItems = dashboardData.recentSecureFindItems.slice(0, 3); // Show only 3 most recent
-
-            if (recentItems.length === 0) {
-                widget.innerHTML = `
-                    <div class="widget-empty">
-                        <div class="widget-empty-icon">🔍</div>
-                        <p>No recent SecureFind activity</p>
-                    </div>
-                `;
-                return;
-            }
-
-            widget.innerHTML = recentItems.map(item => {
-                const timeAgo = getTimeAgo(item.time);
-                return `
-                    <div class="widget-item" onclick="showPage('securefind')">
-                        <div class="widget-item-icon">
-                            ${item.icon}
-                        </div>
-                        <div class="widget-item-content">
-                            <div class="widget-item-title">${item.title}</div>
-                            <div class="widget-item-subtitle">
-                                <span>📍 ${item.location}</span>
-                                <span class="item-status-badge ${item.status}">${item.status.toUpperCase()}</span>
-                            </div>
-                            <div class="widget-item-meta">${timeAgo}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderTasksWidget() {
-            const widget = $('tasks-widget');
-            if (!widget) return;
-
-            const upcomingTasks = dashboardData.upcomingTasks
-                .filter(task => !task.completed)
-                .sort((a, b) => a.dueDate - b.dueDate)
-                .slice(0, 3); // Show only 3 most urgent
-
-            if (upcomingTasks.length === 0) {
-                widget.innerHTML = `
-                    <div class="widget-empty">
-                        <div class="widget-empty-icon">✅</div>
-                        <p>All tasks completed!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            widget.innerHTML = upcomingTasks.map(task => {
-                const timeUntilDue = getTimeUntilDue(task.dueDate);
-                const priorityColor = task.priority === 'high' ? 'var(--error-color)' : 
-                                    task.priority === 'medium' ? 'var(--warning-color)' : 'var(--text-secondary)';
-                
-                return `
-                    <div class="widget-item" onclick="showPage('easytask')">
-                        <input type="checkbox" class="task-checkbox-widget" onchange="toggleTaskFromDashboard('${task.id}', this.checked)" onclick="event.stopPropagation()">
-                        <div class="widget-item-content">
-                            <div class="widget-item-title">${task.title}</div>
-                            <div class="widget-item-subtitle">${task.description}</div>
-                            <div class="widget-item-meta" style="display: flex; justify-content: space-between; align-items: center;">
-                                <span>Due ${timeUntilDue}</span>
-                                <span style="color: ${priorityColor}; font-weight: 500;">${task.priority.toUpperCase()}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderNotificationsWidget() {
-            const widget = $('notifications-widget');
-            if (!widget) return;
-
-            const recentNotifications = notificationData.notifications
-                .slice(0, 3) // Show only 3 most recent
-                .map(notification => {
-                    const timeAgo = getTimeAgo(notification.time);
-                    const typeIcon = getNotificationIcon(notification.type);
-                    
-                    return `
-                        <div class="widget-item ${notification.read ? 'read' : 'unread'}" onclick="openNotificationDetail('${notification.id}')">
-                            <div class="widget-item-icon" style="background: ${getNotificationColor(notification.type)}; color: white;">
-                                ${typeIcon}
-                            </div>
-                            <div class="widget-item-content">
-                                <div class="widget-item-title">${notification.title}</div>
-                                <div class="widget-item-subtitle">${notification.text}</div>
-                                <div class="widget-item-meta">${timeAgo}</div>
-                            </div>
-                            ${!notification.read ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); flex-shrink: 0;"></div>' : ''}
-                        </div>
-                    `;
-                }).join('');
-
-            if (recentNotifications === '') {
-                widget.innerHTML = `
-                    <div class="widget-empty">
-                        <div class="widget-empty-icon">🔔</div>
-                        <p>No recent notifications</p>
-                    </div>
-                `;
-            } else {
-                widget.innerHTML = recentNotifications;
-            }
-        }
-
-        function getNotificationColor(type) {
-            const colors = {
-                message: 'var(--accent-color)',
-                match: 'var(--success-color)',
-                task: 'var(--warning-color)',
-                system: 'var(--primary-color)'
-            };
-            return colors[type] || 'var(--text-secondary)';
-        }
-
-        function getTimeUntilDue(dueDate) {
-            const now = new Date();
-            const diffMs = dueDate - now;
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        // Fix claim modal event handling
+        function openClaimModal(itemId) {
+            claimState.itemId = itemId;
+            const item = getItemById(itemId);
             
-            if (diffMs < 0) return 'overdue';
-            if (diffHours < 1) return 'in less than 1 hour';
-            if (diffHours < 24) return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
-            if (diffDays < 7) return `in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-            return dueDate.toLocaleDateString();
+            // Reset all steps
+            const steps = ['claimStepForm', 'claimStepPending', 'claimStepSuccess', 'claimStepFailed'];
+            steps.forEach(stepId => {
+                const step = $(stepId);
+                if (step) step.style.display = 'none';
+            });
+            
+            // Show form step
+            const formStep = $('claimStepForm');
+            if (formStep) formStep.style.display = 'block';
+
+            // Prefill form
+            const u = state.currentUser || getUser();
+            const titleEl = $('claimItemTitle');
+            const nameEl = $('claimFullName');
+            const idNumberEl = $('claimIdNumber');
+            const expEl = $('claimExp');
+            const stateEl = $('claimState');
+            const imageEl = $('claimIdImage');
+            const confirmEl = $('claimConfirm');
+            
+            if (titleEl) titleEl.textContent = item ? item.title : 'Item';
+            if (nameEl) nameEl.value = [u.firstName || '', u.lastName || ''].join(' ').trim();
+            if (idNumberEl) idNumberEl.value = '';
+            if (expEl) expEl.value = '';
+            if (stateEl) stateEl.value = '';
+            if (imageEl) imageEl.value = '';
+            if (confirmEl) confirmEl.checked = false;
+
+            // Show modal
+            const modal = $('claimModal');
+            if (modal) modal.classList.add('active');
         }
 
-        function toggleTaskFromDashboard(taskId, completed) {
-            const task = dashboardData.upcomingTasks.find(t => t.id === taskId);
-            if (task) {
-                task.completed = completed;
-                // Re-render the tasks widget to update the display
-                setTimeout(() => {
-                    renderTasksWidget();
-                }, 100);
-            }
+        function closeClaimModal() {
+            const modal = $('claimModal');
+            if (modal) modal.classList.remove('active');
         }
 
-        // Sample message data
-        const messageData = {
-            contacts: [
-                {
-                    id: 'contact1',
-                    name: 'Sarah Johnson',
-                    preview: 'Thanks for helping me find my wallet!',
-                    time: '2 min ago',
-                    messages: [
-                        { text: 'Hi! I saw your post about finding a blue wallet in Central Park', sent: false, time: '10:30 AM' },
-                        { text: 'Yes! I found it near the fountain. Can you describe what was inside?', sent: true, time: '10:32 AM' },
-                        { text: 'It has my driver\'s license and a Chase credit card', sent: false, time: '10:33 AM' },
-                        { text: 'Perfect! That matches. When would you like to meet up?', sent: true, time: '10:35 AM' },
-                        { text: 'Thanks for helping me find my wallet!', sent: false, time: '10:40 AM' }
-                    ]
-                },
-                {
-                    id: 'contact2',
-                    name: 'Mike Chen',
-                    preview: 'Is the iPhone still available?',
-                    time: '1 hour ago',
-                    messages: [
-                        { text: 'Hi, I lost my iPhone in the downtown area. Is it still available?', sent: false, time: '9:15 AM' },
-                        { text: 'Yes it is! Can you tell me the model and color?', sent: true, time: '9:20 AM' },
-                        { text: 'iPhone 15 Pro, blue color with a clear case', sent: false, time: '9:22 AM' },
-                        { text: 'Is the iPhone still available?', sent: false, time: '9:45 AM' }
-                    ]
-                },
-                {
-                    id: 'contact3',
-                    name: 'Alex Rivera',
-                    preview: 'Let me know if you need any other details',
-                    time: '3 hours ago',
-                    messages: [
-                        { text: 'I found a black backpack near the university. Is it yours?', sent: true, time: '7:30 AM' },
-                        { text: 'Yes! That sounds like mine. It has a laptop inside?', sent: false, time: '7:35 AM' },
-                        { text: 'Yes, and some textbooks. Where would you like to meet?', sent: true, time: '7:37 AM' },
-                        { text: 'Let me know if you need any other details', sent: false, time: '7:50 AM' }
-                    ]
-                }
-            ],
-            currentContact: null,
-            availableContacts: [
-                { id: 'new1', name: 'Emma Wilson', context: 'Posted about lost keys in downtown area' },
-                { id: 'new2', name: 'David Lee', context: 'Found a wallet near the metro station' },
-                { id: 'new3', name: 'Lisa Garcia', context: 'Looking for lost phone in Central Park' },
-                { id: 'new4', name: 'Tom Anderson', context: 'Found reading glasses at the library' },
-                { id: 'new5', name: 'Maria Rodriguez', context: 'Posted about missing laptop bag' }
-            ]
-        };
-
-        function initializeMessages() {
-            renderContactList();
-            setupMessageInput();
-            
-            // Auto-expand textarea
-            const messageInput = $('messageInput');
-            if (messageInput) {
-                messageInput.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                    
-                    // Enable/disable send button
-                    const sendBtn = $('sendBtn');
-                    sendBtn.disabled = !this.value.trim();
-                });
-                
-                messageInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        if (this.value.trim()) {
-                            sendMessage(e);
-                        }
-                    }
-                });
-            }
-        }
-
-        function renderContactList() {
-            const chatList = $('chatList');
-            if (!chatList) return;
-            
-            chatList.innerHTML = messageData.contacts.map(contact => `
-                <div class="chat-item" onclick="selectContact('${contact.id}')">
-                    <div class="chat-name">${contact.name}</div>
-                    <div class="chat-preview">${contact.preview}</div>
-                    <div class="chat-time">${contact.time}</div>
-                </div>
-            `).join('');
-        }
-
-        function selectContact(contactId) {
-            const contact = messageData.contacts.find(c => c.id === contactId);
-            if (!contact) return;
-            
-            messageData.currentContact = contact;
-            
-            // Update UI
-            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.chat-item').classList.add('active');
-            
-            // Update thread header
-            const threadHeader = $('threadHeader');
-            threadHeader.innerHTML = `${contact.name}`;
-            threadHeader.className = 'thread-header';
-            
-            // Show messages area and form
-            $('messagesList').style.display = 'flex';
-            $('messageForm').style.display = 'flex';
-            
-            // Render messages
-            renderMessages(contact.messages);
-        }
-
-        function renderMessages(messages) {
-            const messagesList = $('messagesList');
-            if (!messagesList) return;
-            
-            messagesList.innerHTML = messages.map(message => `
-                <div class="message-group ${message.sent ? 'sent' : 'received'}">
-                    <div class="message-bubble">${message.text}</div>
-                    <div class="message-time">${message.time}</div>
-                </div>
-            `).join('');
-            
-            // Scroll to bottom
-            messagesList.scrollTop = messagesList.scrollHeight;
-        }
-
-        function sendMessage(e) {
+        function startClaimVerification(e) {
             e.preventDefault();
-            const messageInput = $('messageInput');
-            const message = messageInput.value.trim();
             
-            if (!message || !messageData.currentContact) return;
-            
-            // Add message to current contact
-            const newMessage = {
-                text: message,
-                sent: true,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            
-            messageData.currentContact.messages.push(newMessage);
-            
-            // Update contact preview
-            messageData.currentContact.preview = message;
-            messageData.currentContact.time = 'Just now';
-            
-            // Clear input
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-            $('sendBtn').disabled = true;
-            
-            // Re-render
-            renderMessages(messageData.currentContact.messages);
-            renderContactList();
-            
-            // Simulate response after 2 seconds
-            setTimeout(() => {
-                if (messageData.currentContact) {
-                    const responses = [
-                        "Thanks for the message!",
-                        "Got it, I'll be there soon.",
-                        "Perfect, see you then!",
-                        "Thank you so much for your help!",
-                        "That works for me."
-                    ];
-                    
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    const responseMessage = {
-                        text: randomResponse,
-                        sent: false,
-                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    };
-                    
-                    messageData.currentContact.messages.push(responseMessage);
-                    messageData.currentContact.preview = randomResponse;
-                    messageData.currentContact.time = 'Just now';
-                    
-                    renderMessages(messageData.currentContact.messages);
-                    renderContactList();
-                }
-            }, 2000);
-        }
+            const fullName = $('claimFullName')?.value?.trim();
+            const issuingState = $('claimState')?.value;
+            const idNum = $('claimIdNumber')?.value?.trim();
+            const exp = $('claimExp')?.value;
+            const image = $('claimIdImage')?.files?.[0];
+            const confirmed = $('claimConfirm')?.checked;
 
-        function setupMessageInput() {
-            const contactSearch = $('contactSearch');
-            if (contactSearch) {
-                contactSearch.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const chatItems = document.querySelectorAll('.chat-item');
-                    
-                    chatItems.forEach(item => {
-                        const name = item.querySelector('.chat-name').textContent.toLowerCase();
-                        const preview = item.querySelector('.chat-preview').textContent.toLowerCase();
-                        
-                        if (name.includes(searchTerm) || preview.includes(searchTerm)) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            }
-        }
-
-        // New conversation functions
-        let selectedNewContact = null;
-
-        function openNewConversationModal() {
-            $('newConversationModal').classList.add('active');
-            $('contactNameInput').focus();
-            setupContactSearch();
-        }
-
-        function closeNewConversationModal() {
-            $('newConversationModal').classList.remove('active');
-            $('contactNameInput').value = '';
-            $('contactSuggestions').style.display = 'none';
-            $('startConversationBtn').disabled = true;
-            selectedNewContact = null;
-        }
-
-        function setupContactSearch() {
-            const contactInput = $('contactNameInput');
-            const suggestions = $('contactSuggestions');
-            const startBtn = $('startConversationBtn');
-            
-            contactInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                
-                if (searchTerm.length === 0) {
-                    suggestions.style.display = 'none';
-                    startBtn.disabled = true;
-                    selectedNewContact = null;
-                    return;
-                }
-                
-                const filteredContacts = messageData.availableContacts.filter(contact => 
-                    contact.name.toLowerCase().includes(searchTerm) &&
-                    !messageData.contacts.find(existing => existing.name === contact.name)
-                );
-                
-                if (filteredContacts.length > 0) {
-                    suggestions.innerHTML = filteredContacts.map(contact => `
-                        <div class="contact-suggestion" onclick="selectNewContact('${contact.id}')">
-                            <div class="suggestion-name">${contact.name}</div>
-                            <div class="suggestion-context">${contact.context}</div>
-                        </div>
-                    `).join('');
-                    suggestions.style.display = 'block';
-                } else {
-                    suggestions.innerHTML = '<div class="contact-suggestion" style="color: var(--text-secondary); cursor: default;">No contacts found</div>';
-                    suggestions.style.display = 'block';
-                }
-            });
-        }
-
-        function selectNewContact(contactId) {
-            const contact = messageData.availableContacts.find(c => c.id === contactId);
-            if (!contact) return;
-            
-            selectedNewContact = contact;
-            $('contactNameInput').value = contact.name;
-            $('contactSuggestions').style.display = 'none';
-            $('startConversationBtn').disabled = false;
-        }
-
-        function startNewConversation() {
-            if (!selectedNewContact) return;
-            
-            // Create new conversation
-            const newConversation = {
-                id: 'contact_' + Date.now(),
-                name: selectedNewContact.name,
-                preview: 'New conversation',
-                time: 'Just now',
-                messages: []
-            };
-            
-            // Add to contacts list
-            messageData.contacts.unshift(newConversation);
-            
-            // Remove from available contacts
-            messageData.availableContacts = messageData.availableContacts.filter(
-                c => c.id !== selectedNewContact.id
-            );
-            
-            // Close modal
-            closeNewConversationModal();
-            
-            // Re-render contact list
-            renderContactList();
-            
-            // Auto-select the new conversation
-            selectContact(newConversation.id);
-        }
-
-        // Sample notification data
-        const notificationData = {
-            notifications: [
-                {
-                    id: 'notif1',
-                    type: 'match',
-                    title: 'Potential Match Found',
-                    text: 'Your lost iPhone 15 Pro may have been found! Sarah Johnson posted a matching item in Central Park.',
-                    time: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
-                    read: false,
-                    actionable: true
-                },
-                {
-                    id: 'notif2',
-                    type: 'message',
-                    title: 'New Message',
-                    text: 'Mike Chen sent you a message about the blue wallet you found.',
-                    time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-                    read: false,
-                    actionable: true
-                },
-                {
-                    id: 'notif3',
-                    type: 'task',
-                    title: 'Task Reminder',
-                    text: 'Don\'t forget to complete your profile verification.',
-                    time: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-                    read: true,
-                    actionable: false
-                },
-                {
-                    id: 'notif4',
-                    type: 'system',
-                    title: 'Verification Complete',
-                    text: 'Your identity has been successfully verified. You now have access to all VeriTrust features.',
-                    time: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-                    read: true,
-                    actionable: false
-                },
-                {
-                    id: 'notif5',
-                    type: 'match',
-                    title: 'Item Status Update',
-                    text: 'The black backpack you reported as found has been claimed by its owner.',
-                    time: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-                    read: false,
-                    actionable: false
-                }
-            ]
-        };
-
-        // Notification functions
-        function initializeNotifications() {
-            renderNotifications();
-            setupNotificationSearch();
-            updateNotificationBadge();
-        }
-
-        function renderNotifications() {
-            const notificationsList = $('notificationsList');
-            const emptyState = $('emptyNotifications');
-            const unreadCount = $('unreadCount');
-            
-            if (!notificationsList) return;
-            
-            const searchTerm = ($('notificationSearch')?.value || '').toLowerCase();
-            const filteredNotifications = notificationData.notifications.filter(notif => 
-                notif.title.toLowerCase().includes(searchTerm) || 
-                notif.text.toLowerCase().includes(searchTerm)
-            );
-            
-            if (filteredNotifications.length === 0) {
-                notificationsList.style.display = 'none';
-                emptyState.style.display = 'block';
+            if (!fullName || !issuingState || !idNum || !exp || !image || !confirmed) {
+                alert('Please complete all required fields and confirmations.');
                 return;
             }
-            
-            notificationsList.style.display = 'flex';
-            emptyState.style.display = 'none';
-            
-            const unreadNotifications = notificationData.notifications.filter(n => !n.read);
-            if (unreadCount) {
-                unreadCount.textContent = `${unreadNotifications.length} unread notification${unreadNotifications.length !== 1 ? 's' : ''}`;
-            }
-            
-            notificationsList.innerHTML = filteredNotifications.map(notification => {
-                const timeAgo = getTimeAgo(notification.time);
-                const typeIcon = getNotificationIcon(notification.type);
+
+            // Show pending step
+            const formStep = $('claimStepForm');
+            const pendingStep = $('claimStepPending');
+            if (formStep) formStep.style.display = 'none';
+            if (pendingStep) pendingStep.style.display = 'block';
+
+            // Simulate verification check
+            setTimeout(() => {
+                const success = Math.random() < 0.85; // 85% success rate
+                const pendingStep = $('claimStepPending');
+                const successStep = $('claimStepSuccess');
+                const failedStep = $('claimStepFailed');
                 
-                return `
-                    <div class="notification-item ${notification.read ? 'read' : 'unread'}" onclick="openNotificationDetail('${notification.id}')">
-                        <div class="notification-header">
-                            <div style="display: flex; align-items: center;">
-                                <div class="notification-type-icon ${notification.type}">
-                                    ${typeIcon}
-                                </div>
-                                <div class="notification-title">${notification.title}</div>
-                            </div>
-                            <div class="notification-time">${timeAgo}</div>
-                        </div>
-                        <div class="notification-text">${notification.text}</div>
-                        <div class="notification-actions">
-                            ${!notification.read ? `<button class="notification-action-btn" onclick="event.stopPropagation(); markNotificationRead('${notification.id}')">Mark as read</button>` : ''}
-                            ${notification.actionable ? `<button class="notification-action-btn" onclick="event.stopPropagation(); handleNotificationAction('${notification.id}')">View details</button>` : ''}
-                            <button class="notification-action-btn" onclick="event.stopPropagation(); deleteNotification('${notification.id}')" style="color: var(--error-color);">Delete</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getNotificationIcon(type) {
-            const icons = {
-                message: '💬',
-                match: '✨',
-                task: '📝',
-                system: '⚙️'
-            };
-            return icons[type] || '📢';
-        }
-
-        function getTimeAgo(date) {
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMinutes = Math.floor(diffMs / (1000 * 60));
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
-            if (diffMinutes < 1) return 'Just now';
-            if (diffMinutes < 60) return `${diffMinutes}m ago`;
-            if (diffHours < 24) return `${diffHours}h ago`;
-            if (diffDays < 7) return `${diffDays}d ago`;
-            return date.toLocaleDateString();
-        }
-
-        function setupNotificationSearch() {
-            const searchInput = $('notificationSearch');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    renderNotifications();
-                });
-            }
-        }
-
-        function markNotificationRead(notificationId) {
-            const notification = notificationData.notifications.find(n => n.id === notificationId);
-            if (notification) {
-                notification.read = true;
-                renderNotifications();
-                updateNotificationBadge();
-                saveNotificationsToStorage();
-            }
-        }
-
-        function markAllNotificationsRead() {
-            notificationData.notifications.forEach(notification => {
-                notification.read = true;
-            });
-            renderNotifications();
-            updateNotificationBadge();
-            saveNotificationsToStorage();
-        }
-
-        function deleteNotification(notificationId) {
-            const index = notificationData.notifications.findIndex(n => n.id === notificationId);
-            if (index > -1) {
-                notificationData.notifications.splice(index, 1);
-                renderNotifications();
-                updateNotificationBadge();
-                saveNotificationsToStorage();
-            }
-        }
-
-        function clearReadNotifications() {
-            notificationData.notifications = notificationData.notifications.filter(n => !n.read);
-            renderNotifications();
-            updateNotificationBadge();
-            saveNotificationsToStorage();
-        }
-
-        function openNotificationDetail(notificationId) {
-            const notification = notificationData.notifications.find(n => n.id === notificationId);
-            if (!notification) return;
-            
-            // Mark as read when opened
-            if (!notification.read) {
-                markNotificationRead(notificationId);
-            }
-            
-            // Handle different notification types
-            switch (notification.type) {
-                case 'message':
-                    showPage('messages');
-                    break;
-                case 'match':
-                    showPage('securefind');
-                    break;
-                case 'task':
-                    showPage('easytask');
-                    break;
-                default:
-                    // Show a simple alert for system notifications
-                    alert(notification.text);
-            }
-        }
-
-        function handleNotificationAction(notificationId) {
-            const notification = notificationData.notifications.find(n => n.id === notificationId);
-            if (!notification) return;
-            
-            openNotificationDetail(notificationId);
-        }
-
-        function updateNotificationBadge() {
-            const unreadCount = notificationData.notifications.filter(n => !n.read).length;
-            const notificationBtn = document.querySelector('button[onclick="showPage(\'notifications\')"]');
-            
-            if (notificationBtn) {
-                // Remove existing badge
-                const existingBadge = notificationBtn.querySelector('.unread-badge');
-                if (existingBadge) {
-                    existingBadge.remove();
-                }
+                if (pendingStep) pendingStep.style.display = 'none';
                 
-                // Add new badge if there are unread notifications
-                if (unreadCount > 0) {
-                    const badge = document.createElement('span');
-                    badge.className = 'unread-badge';
-                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                    notificationBtn.appendChild(badge);
+                if (success) {
+                    const item = getItemById(claimState.itemId);
+                    if (successStep) successStep.style.display = 'block';
+                    
+                    // Add notification
+                    addNotification({
+                        type: 'system',
+                        title: 'Claim Submitted',
+                        text: `Your State ID was verified for ${item ? item.title : 'the item'}. The finder will be notified.`
+                    });
+                } else {
+                    if (failedStep) failedStep.style.display = 'block';
                 }
-            }
+            }, 1500);
         }
 
-        function saveNotificationsToStorage() {
-            localStorage.setItem('veritrustNotifications', JSON.stringify(notificationData.notifications));
-        }
-
-        function loadNotificationsFromStorage() {
-            const stored = localStorage.getItem('veritrustNotifications');
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    // Convert time strings back to Date objects
-                    notificationData.notifications = parsed.map(notif => ({
-                        ...notif,
-                        time: new Date(notif.time)
-                    }));
-                } catch (e) {
-                    console.error('Error loading notifications:', e);
-                }
-            }
+        function retryClaimVerification() {
+            const failedStep = $('claimStepFailed');
+            const formStep = $('claimStepForm');
+            if (failedStep) failedStep.style.display = 'none';
+            if (formStep) formStep.style.display = 'block';
         }
 
         // Helper functions
@@ -1512,130 +761,571 @@
             // Show login section by default
             showLogin();
             
-            // Close dropdown when clicking outside
+            // Close dropdown and modals when clicking outside
             document.addEventListener('click', function(e) {
                 if (!e.target.closest('.user-menu')) {
                     hide($('userDropdown'));
                 }
                 
-                // Close new conversation modal when clicking outside
-                const modal = $('newConversationModal');
-                if (modal && e.target === modal) {
+                // Close modals when clicking outside
+                const newConversationModal = $('newConversationModal');
+                const claimModal = $('claimModal');
+                
+                if (newConversationModal && e.target === newConversationModal) {
                     closeNewConversationModal();
+                }
+                
+                if (claimModal && e.target === claimModal) {
+                    closeClaimModal();
                 }
             });
             
             // Handle escape key for modals
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    const modal = $('newConversationModal');
-                    if (modal && modal.classList.contains('active')) {
+                    const newConversationModal = $('newConversationModal');
+                    const claimModal = $('claimModal');
+                    
+                    if (newConversationModal && newConversationModal.classList.contains('active')) {
                         closeNewConversationModal();
+                    }
+                    
+                    if (claimModal && claimModal.classList.contains('active')) {
+                        closeClaimModal();
                     }
                 }
             });
         });
 
-        // Helper: add a notification
-    function addNotification({ type = 'system', title, text }) {
-        notificationData.notifications.unshift({
-            id: 'notif_' + Date.now(),
-            type,
-            title,
-            text,
-            time: new Date(),
-            read: false,
-            actionable: false
-        });
-        saveNotificationsToStorage();
-        updateNotificationBadge();
-        if (state.currentPage === 'notifications') {
-            renderNotifications();
-        }
-        // Also refresh dashboard widget if visible
-        if (state.currentPage === 'dashboard') {
-            renderNotificationsWidget?.();
-        }
-    }
-
-    // Claim (State ID verification) state and handlers
-    const claimState = { itemId: null };
-
-    function getItemById(itemId) {
-        // Reuse dashboard data items for quick lookup
-        return (dashboardData?.recentSecureFindItems || []).find(i => i.id === itemId) || null;
-    }
-
-    function openClaimModal(itemId) {
-        claimState.itemId = itemId;
-        const item = getItemById(itemId);
-        // Reset steps
-        $('#claimStepForm').style.display = 'block';
-        $('#claimStepPending').style.display = 'none';
-        $('#claimStepSuccess').style.display = 'none';
-        $('#claimStepFailed').style.display = 'none';
-
-        // Prefill
-        const u = state.currentUser || getUser();
-        $('#claimItemTitle').textContent = item ? item.title : 'Item';
-        $('#claimFullName').value = [u.firstName || '', u.lastName || ''].join(' ').trim();
-        $('#claimIdNumber').value = '';
-        $('#claimExp').value = '';
-        $('#claimState').value = '';
-        $('#claimIdImage').value = '';
-        $('#claimConfirm').checked = false;
-
-        // Show modal
-        $('#claimModal').classList.add('active');
-    }
-
-    function closeClaimModal() {
-        $('#claimModal').classList.remove('active');
-    }
-
-    function startClaimVerification(e) {
-        e.preventDefault();
-        const fullName = $('#claimFullName').value.trim();
-        const issuingState = $('#claimState').value;
-        const idNum = $('#claimIdNumber').value.trim();
-        const exp = $('#claimExp').value;
-        const image = $('#claimIdImage').files[0];
-        const confirmed = $('#claimConfirm').checked;
-
-        if (!fullName || !issuingState || !idNum || !exp || !image || !confirmed) {
-            alert('Please complete all required fields and confirmations.');
-            return;
+        // App functions
+        function startApp() {
+            hide($('auth-section'));
+            hide($('verification-section'));
+            show($('app-section'));
+            updateUserAvatar();
+            showPage('dashboard');
         }
 
-        // Show pending
-        $('#claimStepForm').style.display = 'none';
-        $('#claimStepPending').style.display = 'block';
+        function showPage(page) {
+            state.currentPage = page;
+            const titleEl = $('page-title');
+            if (titleEl) titleEl.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+            
+            // Update nav
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const navLink = document.querySelector(`[onclick="showPage('${page}')"]`);
+            if (navLink) navLink.classList.add('active');
+            
+            // Load page content
+            loadPageContent(page);
+        }
 
-        // Simulate verification check
-        setTimeout(() => {
-            // 85% success simulation
-            const success = Math.random() < 0.85;
-            $('#claimStepPending').style.display = 'none';
-            if (success) {
-                const item = getItemById(claimState.itemId);
-                $('#claimStepSuccess').style.display = 'block';
-                // Notify
-                addNotification({
-                    type: 'system',
-                    title: 'Claim submitted',
-                    text: `Your State ID was verified for ${item ? item.title : 'the item'}. The finder will be notified.`
-                });
-            } else {
-                $('#claimStepFailed').style.display = 'block';
+        function loadPageContent(page) {
+            const content = $('main-content');
+            if (!content) return;
+            
+            const pages = {
+                dashboard: getDashboardContent(),
+                securefind: getSecureFindContent(),
+                easytask: getEasyTaskContent(),
+                messages: getMessagesContent(),
+                notifications: getNotificationsContent(),
+                profile: getProfileContent()
+            };
+            
+            content.innerHTML = pages[page] || '<div class="text-center">Page not found</div>';
+            
+            // Initialize page-specific functionality
+            if (page === 'messages') {
+                initializeMessages();
+            } else if (page === 'notifications') {
+                initializeNotifications();
+            } else if (page === 'dashboard') {
+                initializeDashboard();
             }
-        }, 1500);
-    }
+        }
 
-    function retryClaimVerification() {
-        // Return to form step
-        $('#claimStepFailed').style.display = 'none';
-        $('#claimStepForm').style.display = 'block';
-    }
+        function getDashboardContent() {
+            const user = state.currentUser || {};
+            const lostItems = dashboardData.recentSecureFindItems.filter(item => item.status === 'lost').length;
+            const foundItems = dashboardData.recentSecureFindItems.filter(item => item.status === 'found').length;
+            const pendingTasks = dashboardData.upcomingTasks.filter(task => !task.completed).length;
+            
+            return `
+                <div class="status-card mb-lg">
+                    <h3>Welcome back, ${user.firstName || 'User'}!</h3>
+                    <p>Your identity is verified. Access all features securely.</p>
+                </div>
+                
+                <div class="action-grid">
+                    <div class="action-card" onclick="showPage('securefind')">
+                        <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">📱</div>
+                        <h4>Report Lost Item</h4>
+                        <p>Lost something? Let the community help find it</p>
+                    </div>
+                    <div class="action-card" onclick="showPage('easytask')">
+                        <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">➕</div>
+                        <h4>Add Task</h4>
+                        <p>Create a new task to stay organized</p>
+                    </div>
+                    <div class="action-card" onclick="showPage('messages')">
+                        <div style="font-size: 2rem; margin-bottom: var(--spacing-md); text-align: center;">💬</div>
+                        <h4>Messages</h4>
+                        <p>Check your conversations and updates</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-widgets">
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Recent SecureFind Activity</h3>
+                            <a href="#" class="widget-view-all" onclick="showPage('securefind')">View All →</a>
+                        </div>
+                        <div class="widget-content" id="securefind-widget"></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Upcoming Tasks</h3>
+                            <a href="#" class="widget-view-all" onclick="showPage('easytask')">View All →</a>
+                        </div>
+                        <div class="widget-content" id="tasks-widget"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-widgets" style="margin-top: var(--spacing-lg);">
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Quick Stats</h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg); text-align: center;">
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">${lostItems}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">Lost Items</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">${foundItems}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">Found Items</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning-color);">${pendingTasks}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">Pending Tasks</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Recent Notifications</h3>
+                            <a href="#" class="widget-view-all" onclick="showPage('notifications')">View All →</a>
+                        </div>
+                        <div class="widget-content" id="notifications-widget"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getSecureFindContent() {
+            return `
+                <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                    <input type="text" placeholder="Search items..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                </div>
+                <div class="items-grid">
+                    <div class="item-card">
+                        <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">📱</div>
+                        <h4>iPhone 15 Pro</h4>
+                        <p>📍 Downtown Coffee Shop</p>
+                        <p>Lost 2 hours ago</p>
+                    </div>
+                    <div class="item-card">
+                        <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">💳</div>
+                        <h4>Blue Wallet</h4>
+                        <p>📍 Central Park</p>
+                        <p>Found 6 hours ago</p>
+                        <div style="margin-top: var(--spacing-sm);">
+                            <button class="btn-secondary" onclick="openClaimModal('item2')">Claim Item</button>
+                        </div>
+                    </div>
+                    <div class="item-card">
+                        <div style="font-size: 2rem; text-align: center; margin-bottom: var(--spacing-md);">🎒</div>
+                        <h4>Black Backpack</h4>
+                        <p>📍 University Campus</p>
+                        <p>Lost 3 days ago</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getEasyTaskContent() {
+            return `
+                <div style="background: var(--surface-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center;">
+                    <button class="btn-primary" onclick="alert('Add task feature coming soon!')">+ Add Task</button>
+                </div>
+                <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <input type="checkbox">
+                    <div style="flex: 1;">
+                        <h4>Review SecureFind matches</h4>
+                        <p>Check potential matches and respond to messages</p>
+                    </div>
+                </div>
+                <div class="task-item" style="display: flex; align-items: center; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                    <input type="checkbox">
+                    <div style="flex: 1;">
+                        <h4>Update profile information</h4>
+                        <p>Complete your profile details for better verification</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getMessagesContent() {
+            return `
+                <div class="messages-container">
+                    <aside class="messages-sidebar">
+                        <button class="new-conversation-btn" onclick="openNewConversationModal()">+ New Conversation</button>
+                        <div style="margin-bottom: var(--spacing-md);">
+                            <input type="text" id="contactSearch" placeholder="Search conversations..." style="width: 100%; padding: var(--spacing-sm); border: 2px solid var(--border-color); border-radius: var(--border-radius); margin: 0;">
+                        </div>
+                        <div id="chatList" class="chat-list"></div>
+                    </aside>
+                    <section class="messages-thread">
+                        <div id="threadHeader" class="thread-header">
+                            <div class="empty-chat">
+                                <div class="empty-chat-icon">💬</div>
+                                <h3>Select a conversation</h3>
+                                <p>Choose a conversation from the left to start messaging</p>
+                            </div>
+                        </div>
+                        <div id="messagesList" class="messages-list" style="display: none;"></div>
+                        <form id="messageForm" class="message-form" onsubmit="sendMessage(event)" style="display: none;">
+                            <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+                            <button type="submit" class="send-btn" id="sendBtn" disabled>Send</button>
+                        </form>
+                    </section>
+                </div>
+                <div id="newConversationModal" class="new-conversation-modal">
+                    <div class="new-conversation-form">
+                        <h3>Start New Conversation</h3>
+                        <div class="form-group">
+                            <label for="contactNameInput">Search for people</label>
+                            <input type="text" id="contactNameInput" placeholder="Type a name..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                            <div id="contactSuggestions" class="contact-suggestions" style="display: none;"></div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                            <button type="button" class="btn-secondary" onclick="closeNewConversationModal()">Cancel</button>
+                            <button type="button" class="btn-primary" id="startConversationBtn" onclick="startNewConversation()" disabled>Start Conversation</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getNotificationsContent() {
+            return `
+                <div class="notifications-wrapper">
+                    <div class="notifications-header">
+                        <div>
+                            <h3>Notifications</h3>
+                            <p id="unreadCount" style="color: var(--text-secondary); margin-top: var(--spacing-xs);"></p>
+                        </div>
+                        <div class="notifications-actions">
+                            <button class="btn-secondary" onclick="markAllNotificationsRead()">Mark All Read</button>
+                            <button class="btn-secondary" onclick="clearReadNotifications()">Clear Read</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: var(--spacing-md);">
+                        <input type="text" id="notificationSearch" placeholder="Search notifications..." style="width: 100%; padding: var(--spacing-md); border: 2px solid var(--border-color); border-radius: var(--border-radius);">
+                    </div>
+                    <div id="notificationsList" class="notifications-list"></div>
+                    <div id="emptyNotifications" class="empty-notifications" style="display: none;">
+                        <div class="empty-notifications-icon">🔔</div>
+                        <h3>No notifications</h3>
+                        <p>You're all caught up!</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getProfileContent() {
+            const user = state.currentUser || {};
+            return `
+                <div class="profile-card">
+                    <h3 style="text-align: center; margin-bottom: var(--spacing-lg);">Profile Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                        <div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">First Name</div>
+                            <div style="font-weight: 600;">${user.firstName || '-'}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Last Name</div>
+                            <div style="font-weight: 600;">${user.lastName || '-'}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                        <div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Email</div>
+                            <div style="font-weight: 600;">${user.email || '-'}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-xs);">Status</div>
+                            <div style="font-weight: 600; color: ${state.isVerified ? 'var(--success-color)' : 'var(--warning-color)'};">${state.isVerified ? 'Verified' : 'Pending'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Helper functions
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMinutes < 1) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function getTimeUntilDue(dueDate) {
+            const now = new Date();
+            const diffMs = dueDate - now;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMs < 0) return 'overdue';
+            if (diffHours < 1) return 'in less than 1 hour';
+            if (diffHours < 24) return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+            if (diffDays < 7) return `in ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+            return dueDate.toLocaleDateString();
+        }
+
+        // Dashboard widget functions
+        function initializeDashboard() {
+            renderSecureFindWidget();
+            renderTasksWidget();
+            renderNotificationsWidget();
+        }
+
+        function renderSecureFindWidget() {
+            const widget = $('securefind-widget');
+            if (!widget) return;
+
+            const recentItems = dashboardData.recentSecureFindItems.slice(0, 3);
+            
+            widget.innerHTML = recentItems.map(item => {
+                const timeAgo = getTimeAgo(item.time);
+                return `
+                    <div class="widget-item" onclick="showPage('securefind')">
+                        <div class="widget-item-icon">${item.icon}</div>
+                        <div class="widget-item-content">
+                            <div class="widget-item-title">${item.title}</div>
+                            <div class="widget-item-subtitle">
+                                <span>📍 ${item.location}</span>
+                                <span class="item-status-badge ${item.status}">${item.status.toUpperCase()}</span>
+                            </div>
+                            <div class="widget-item-meta">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTasksWidget() {
+            const widget = $('tasks-widget');
+            if (!widget) return;
+
+            const upcomingTasks = dashboardData.upcomingTasks
+                .filter(task => !task.completed)
+                .sort((a, b) => a.dueDate - b.dueDate)
+                .slice(0, 3);
+
+            widget.innerHTML = upcomingTasks.map(task => {
+                const timeUntilDue = getTimeUntilDue(task.dueDate);
+                const priorityColor = task.priority === 'high' ? 'var(--error-color)' : 
+                                    task.priority === 'medium' ? 'var(--warning-color)' : 'var(--text-secondary)';
+                
+                return `
+                    <div class="widget-item" onclick="showPage('easytask')">
+                        <input type="checkbox" class="task-checkbox-widget" onchange="toggleTaskFromDashboard('${task.id}', this.checked)" onclick="event.stopPropagation()">
+                        <div class="widget-item-content">
+                            <div class="widget-item-title">${task.title}</div>
+                            <div class="widget-item-subtitle">${task.description}</div>
+                            <div class="widget-item-meta" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Due ${timeUntilDue}</span>
+                                <span style="color: ${priorityColor}; font-weight: 500;">${task.priority.toUpperCase()}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderNotificationsWidget() {
+            const widget = $('notifications-widget');
+            if (!widget) return;
+
+            const recentNotifications = notificationData.notifications.slice(0, 3);
+            
+            widget.innerHTML = recentNotifications.map(notification => {
+                const timeAgo = getTimeAgo(notification.time);
+                const typeIcon = getNotificationIcon(notification.type);
+                
+                return `
+                    <div class="widget-item" onclick="openNotificationDetail('${notification.id}')">
+                        <div class="widget-item-icon" style="background: ${getNotificationColor(notification.type)}; color: white;">
+                            ${typeIcon}
+                        </div>
+                        <div class="widget-item-content">
+                            <div class="widget-item-title">${notification.title}</div>
+                            <div class="widget-item-subtitle">${notification.text}</div>
+                            <div class="widget-item-meta">${timeAgo}</div>
+                        </div>
+                        ${!notification.read ? '<div style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-color); flex-shrink: 0;"></div>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTaskFromDashboard(taskId, completed) {
+            const task = dashboardData.upcomingTasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = completed;
+                setTimeout(() => renderTasksWidget(), 100);
+            }
+        }
+
+        // Add all missing functions with basic implementations
+        function initializeMessages() {
+            renderContactList();
+        }
+
+        function renderContactList() {
+            const chatList = $('chatList');
+            if (!chatList) return;
+            
+            chatList.innerHTML = messageData.contacts.map(contact => `
+                <div class="chat-item" onclick="selectContact('${contact.id}')">
+                    <div class="chat-name">${contact.name}</div>
+                    <div class="chat-preview">${contact.preview}</div>
+                    <div class="chat-time">${contact.time}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectContact(contactId) {
+            // Basic implementation
+            alert('Select contact: ' + contactId);
+        }
+
+        function sendMessage(e) {
+            e.preventDefault();
+            alert('Send message functionality');
+        }
+
+        function openNewConversationModal() {
+            const modal = $('newConversationModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeNewConversationModal() {
+            const modal = $('newConversationModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function startNewConversation() {
+            alert('Start new conversation');
+        }
+
+        function initializeNotifications() {
+            renderNotifications();
+            updateNotificationBadge();
+        }
+
+        function renderNotifications() {
+            const notificationsList = $('notificationsList');
+            if (!notificationsList) return;
+            
+            notificationsList.innerHTML = '<div class="text-center">Notifications loaded</div>';
+        }
+
+        function markAllNotificationsRead() {
+            alert('Mark all as read');
+        }
+
+        function clearReadNotifications() {
+            alert('Clear read notifications');
+        }
+
+        function openNotificationDetail(id) {
+            alert('Open notification: ' + id);
+        }
+
+        function markNotificationRead(id) {
+            alert('Mark as read: ' + id);
+        }
+
+        function deleteNotification(id) {
+            alert('Delete notification: ' + id);
+        }
+
+        function getNotificationIcon(type) {
+            const icons = { message: '💬', match: '✨', task: '📝', system: '⚙️' };
+            return icons[type] || '📢';
+        }
+
+        function getNotificationColor(type) {
+            const colors = {
+                message: 'var(--accent-color)',
+                match: 'var(--success-color)', 
+                task: 'var(--warning-color)',
+                system: 'var(--primary-color)'
+            };
+            return colors[type] || 'var(--text-secondary)';
+        }
+
+        function updateNotificationBadge() {
+            // Basic implementation
+        }
+
+        function saveNotificationsToStorage() {
+            localStorage.setItem('veritrustNotifications', JSON.stringify(notificationData.notifications));
+        }
+
+        function loadNotificationsFromStorage() {
+            const stored = localStorage.getItem('veritrustNotifications');
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    notificationData.notifications = parsed.map(notif => ({
+                        ...notif,
+                        time: new Date(notif.time)
+                    }));
+                } catch (e) {
+                    console.error('Error loading notifications:', e);
+                }
+            }
+        }
+
+        function addNotification({ type = 'system', title, text }) {
+            notificationData.notifications.unshift({
+                id: 'notif_' + Date.now(),
+                type,
+                title,
+                text,
+                time: new Date(),
+                read: false,
+                actionable: false
+            });
+            saveNotificationsToStorage();
+        }
+
+        function getItemById(itemId) {
+            return dashboardData.recentSecureFindItems.find(i => i.id === itemId) || null;
+        }
+
+        // ...existing code for auth, verification, claim functions...
     </script>
 
     <!-- Claim Modal -->
